@@ -1,0 +1,19 @@
+/* Global app styles.
+   Note: Most styling is Tailwind via CDN in `index.html`. This file holds the few
+   project-specific utilities we rely on. */
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* Used by the Dashboard to render RTL Persian query text. */
+.font-farsi {
+  font-family: "Vazirmatn", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+}
+
+

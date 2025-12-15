@@ -1,0 +1,5 @@
+{
+  "name": "Iranian Media Intelligence",
+  "description": "A professional intelligence dashboard for monitoring and analyzing Iranian narratives across specific media outlets using Gemini and Exa.",
+  "requestFramePermissions": []
+}
