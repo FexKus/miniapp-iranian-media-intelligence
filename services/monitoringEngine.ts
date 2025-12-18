@@ -71,10 +71,10 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
         startPublishedDate = new Date(item.customStartDate).toISOString();
         endPublishedDate = new Date(item.customEndDate).toISOString();
       } else {
-        // Default to last 24h
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        startPublishedDate = yesterday.toISOString();
+        // Default to last 7 days for better article coverage
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        startPublishedDate = sevenDaysAgo.toISOString();
         // endPublishedDate left undefined means "now"
       }
 
