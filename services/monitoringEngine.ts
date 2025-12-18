@@ -87,11 +87,11 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
       // endPublishedDate left undefined means "now"
 
       const articles: ArticleResult[] = await searchExa(
-        exaApiKey, 
-        persianQuery, 
-        activeDomains, 
-        5, 
-        startPublishedDate, 
+        exaApiKey,
+        persianQuery,
+        activeDomains,
+        3, // Limited to 3 articles for reliable Edge function completion within 25s
+        startPublishedDate,
         endPublishedDate
       );
       if (isCancelled()) throw new Error("Cancelled");

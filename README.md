@@ -208,17 +208,20 @@ Each intelligence report includes:
 
 ## Performance & Optimization
 
-### Quality Settings
-- **Article Content**: 3,500 characters per article (optimized for quality + speed)
+### Quality Settings (Free Tier)
+- **Articles per Topic**: 3 articles (optimized for 25s Edge function limit)
+- **Article Content**: 3,500 characters per article (quality + speed balance)
 - **Search Window**: 7-day default (customizable)
 - **AI Model**: Gemini 3.0 Flash (December 2025 release)
-- **Timeout**: 60 seconds max per analysis
+- **Timeout**: 25 seconds (Edge runtime on free tier)
 
 ### Speed Expectations
 - Translation: ~2-3 seconds
 - Search: ~3-5 seconds
-- Analysis: ~15-20 seconds
-- **Total per topic**: ~20-30 seconds
+- Analysis (3 articles): ~12-18 seconds
+- **Total per topic**: ~18-25 seconds
+
+**Note**: For analyzing 5-10 articles per topic, upgrade to Vercel Pro (see "Upgrading to Vercel Pro" section below).
 
 ## Supported Media Sources
 
@@ -310,6 +313,47 @@ Each intelligence report includes:
 2. Navigate to API settings
 3. Generate API key
 4. Add to Vercel as `EXA_API_KEY`
+
+## Upgrading to Vercel Pro for Enhanced Performance
+
+### Current Limitations (Free Tier)
+
+On Vercel's free/hobby plan with Edge runtime:
+- **Timeout**: 25 seconds (hard limit)
+- **Article Limit**: 3 articles per topic (to ensure completion)
+- **Occasional timeouts** on complex analysis
+
+### Benefits of Upgrading to Vercel Pro ($20/month)
+
+With Vercel Pro + Node.js Serverless runtime:
+- **Timeout**: 60 seconds (vs 25s on free)
+- **Article Limit**: Analyze 5-10 articles per topic reliably
+- **More thorough analysis**: Larger article content (up to 5000+ chars)
+- **Better reliability**: No timeout issues even on complex topics
+
+### Migration Steps (When Ready to Upgrade)
+
+1. **Upgrade your Vercel plan** to Pro ($20/month)
+2. **Convert API handlers** from Edge to Node.js Serverless runtime:
+   - Change `runtime: "edge"` to `runtime: "nodejs"`
+   - Update handler signature from Web API to Node.js pattern
+   - Requires code changes in `/api` directory
+3. **Increase limits**:
+   - Set `numResults` to 5-10 articles
+   - Increase article content to 5000+ characters
+   - Add `maxDuration: 60` to analyze endpoint
+
+**Note**: This migration requires technical changes to API handlers. Contact support or refer to Vercel's [serverless function documentation](https://vercel.com/docs/functions/serverless-functions) for implementation details.
+
+### When to Upgrade
+
+Consider upgrading if:
+- You need analysis of 5+ articles per topic
+- Complex topics frequently timeout
+- You want maximum analysis depth and quality
+- This tool is mission-critical for your workflow
+
+For most use cases, the **free tier with 3-article analysis is sufficient** and produces high-quality intelligence reports.
 
 ## Contributing
 
