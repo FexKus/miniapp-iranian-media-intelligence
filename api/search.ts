@@ -1,6 +1,6 @@
-import { INITIAL_SOURCES } from "../constants";
-import { ArticleResult } from "../types";
-import { normalizeHostname, readJson, requireEnv, safeHostnameFromUrl } from "./_shared";
+import { INITIAL_SOURCES } from "../constants.js";
+import { ArticleResult } from "../types.js";
+import { normalizeHostname, readJson, requireEnv, safeHostnameFromUrl } from "./_shared.js";
 
 export const config = {
   runtime: "nodejs",

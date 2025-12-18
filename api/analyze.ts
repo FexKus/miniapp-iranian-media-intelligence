@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { ArticleResult } from "../types";
-import { readJson, requireEnv } from "./_shared";
+import { ArticleResult } from "../types.js";
+import { readJson, requireEnv } from "./_shared.js";
 
 export const config = {
   runtime: "nodejs",

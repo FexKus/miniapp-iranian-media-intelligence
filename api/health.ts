@@ -1,4 +1,4 @@
-import { requireEnv } from "./_shared";
+import { requireEnv } from "./_shared.js";
 
 export const config = {
   runtime: "nodejs",
@@ -20,7 +20,7 @@ export default async function handler(req: Request): Promise<Response> {
       ok: true,
       hasGeminiKey,
       hasExaKey,
-      geminiTranslationModel: process.env.GEMINI_TRANSLATION_MODEL || "gemini-3-pro-preview",
+      geminiTranslationModel: process.env.GEMINI_TRANSLATION_MODEL || "gemini-3-flash-preview",
       geminiAnalysisModel: process.env.GEMINI_ANALYSIS_MODEL || "gemini-3-pro-preview",
     });
   } catch (e) {
