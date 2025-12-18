@@ -21,7 +21,7 @@ export default async function handler(req: Request): Promise<Response> {
       hasGeminiKey,
       hasExaKey,
       geminiTranslationModel: process.env.GEMINI_TRANSLATION_MODEL || "gemini-3-flash-preview",
-      geminiAnalysisModel: process.env.GEMINI_ANALYSIS_MODEL || "gemini-3-pro-preview",
+      geminiAnalysisModel: process.env.GEMINI_ANALYSIS_MODEL || "gemini-3-flash-preview",
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";

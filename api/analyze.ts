@@ -18,8 +18,8 @@ export default async function handler(req: Request): Promise<Response> {
     if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
     const apiKey = requireEnv("GEMINI_API_KEY");
-    // Use Gemini 3.0 Pro for advanced intelligence analysis
-    const modelName = process.env.GEMINI_ANALYSIS_MODEL || "gemini-3-pro-preview";
+    // Use Gemini 3.0 Flash for fast, high-quality intelligence analysis
+    const modelName = process.env.GEMINI_ANALYSIS_MODEL || "gemini-3-flash-preview";
 
     const { topic, articles, domainLeanings } = await readJson<AnalyzeBody>(req);
     if (!topic?.trim()) return new Response("Missing topic", { status: 400 });
