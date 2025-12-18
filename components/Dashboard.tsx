@@ -17,49 +17,57 @@ const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, on
   // Helper to render markdown content safely and cleanly
   const MarkdownComponents = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    strong: ({ node, ...props }: any) => <span className="font-bold text-emerald-400" {...props} />,
+    strong: ({ node, ...props }: any) => <span className="font-bold text-accent" {...props} />,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    h1: ({ node, ...props }: any) => <h3 className="text-xl font-bold text-white mt-4 mb-2" {...props} />,
+    h1: ({ node, ...props }: any) => <h3 className="text-xl font-bold font-serif text-gray-900 mt-6 mb-3" {...props} />,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    h2: ({ node, ...props }: any) => <h4 className="text-lg font-bold text-slate-200 mt-4 mb-2" {...props} />,
+    h2: ({ node, ...props }: any) => <h4 className="text-lg font-bold font-serif text-gray-900 mt-5 mb-2" {...props} />,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    h3: ({ node, ...props }: any) => <h5 className="text-md font-bold text-slate-300 mt-3 mb-1" {...props} />,
+    h3: ({ node, ...props }: any) => <h5 className="text-md font-bold font-serif text-gray-800 mt-4 mb-2" {...props} />,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ul: ({ node, ...props }: any) => <ul className="list-disc pl-5 space-y-1 text-slate-300 mb-4" {...props} />,
+    ul: ({ node, ...props }: any) => <ul className="list-disc pl-5 space-y-2 text-gray-700 mb-4 marker:text-accent" {...props} />,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    li: ({ node, ...props }: any) => <li className="pl-1 marker:text-emerald-500" {...props} />,
+    li: ({ node, ...props }: any) => <li className="pl-1" {...props} />,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    p: ({ node, ...props }: any) => <p className="text-slate-300 leading-relaxed mb-4" {...props} />,
+    p: ({ node, ...props }: any) => <p className="text-gray-700 leading-relaxed mb-4" {...props} />,
   };
 
   return (
     <div className="max-w-5xl mx-auto pb-20">
-      {/* Header Action Area */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-8 mb-10 flex flex-col md:flex-row justify-between items-center shadow-2xl">
+      {/* Site Header (Only visible on Dashboard to match prototype layout) */}
+      <header className="mb-12 pb-8 border-b border-gray-200">
+        <h1 className="text-4xl font-bold font-serif text-gray-900 mb-3 tracking-tight">Iranian Media Intelligence</h1>
+        <p className="text-lg text-gray-600 max-w-2xl font-light">
+          Monitoring and analyzing media coverage across Iranian news outlets. Real-time intelligence on emerging narratives and geopolitical developments.
+        </p>
+      </header>
+
+      {/* Dashboard Header & Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start mb-10 pb-6 border-b border-gray-200">
         <div>
-          <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">Intelligence Dashboard</h2>
-          <p className="text-slate-400">
-            Monitoring <span className="text-white font-semibold">{watchlist.length}</span> objectives across active channels.
+          <h2 className="text-3xl font-bold font-serif text-gray-900 mb-1">Intelligence Dashboard</h2>
+          <p className="text-gray-500 text-sm">
+            Monitoring <strong className="text-gray-900 font-semibold">{watchlist.length}</strong> objectives across active channels.
           </p>
         </div>
         <div className="mt-6 md:mt-0 flex items-center gap-3">
           <button
             onClick={onRunMonitoring}
             disabled={isRunning || watchlist.length === 0}
-            className={`flex items-center space-x-3 px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-emerald-500/20 ${
+            className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium text-[15px] transition-all shadow-sm hover:shadow-md ${
               isRunning 
-                ? 'bg-slate-700 text-slate-400 cursor-not-allowed' 
-                : 'bg-emerald-600 hover:bg-emerald-500 text-white transform hover:-translate-y-1'
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none' 
+                : 'bg-accent hover:bg-accent-hover text-white transform hover:-translate-y-px'
             }`}
           >
             {isRunning ? (
               <>
-                <Loader2 className="animate-spin" />
+                <Loader2 className="animate-spin w-5 h-5" />
                 <span>Running Analysis...</span>
               </>
             ) : (
               <>
-                <Play fill="currentColor" />
+                <Play fill="currentColor" className="w-4 h-4" />
                 <span>Run Monitoring</span>
               </>
             )}
@@ -68,9 +76,9 @@ const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, on
           {isRunning && (
             <button
               onClick={onCancelMonitoring}
-              className="flex items-center space-x-2 px-5 py-4 rounded-xl font-bold text-lg transition-all border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200"
+              className="flex items-center space-x-2 px-5 py-3 rounded-lg font-medium text-[15px] transition-all border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
             >
-              <Ban />
+              <Ban className="w-4 h-4" />
               <span>Cancel</span>
             </button>
           )}
@@ -84,75 +92,82 @@ const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, on
           
           if (!report) {
             return (
-              <div key={item.id} className="bg-slate-900/50 border border-slate-800 border-dashed rounded-xl p-8 text-center">
-                <h3 className="text-lg font-medium text-slate-500 mb-1">{item.topic}</h3>
-                <p className="text-sm text-slate-600">No analysis data available. Run monitoring to generate intelligence.</p>
+              <div key={item.id} className="bg-white border-2 border-dashed border-gray-200 rounded-lg p-10 text-center">
+                <h3 className="text-lg font-serif font-semibold text-gray-500 mb-1">{item.topic}</h3>
+                <p className="text-sm text-gray-400">No analysis data available. Run monitoring to generate intelligence.</p>
               </div>
             );
           }
 
           return (
-            <div key={item.id} className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+            <article key={item.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
               {/* Report Header */}
-              <div className="bg-slate-950/50 p-6 border-b border-slate-800 flex justify-between items-start">
+              <div className="bg-surface-secondary p-6 border-b border-gray-100 flex justify-between items-start">
                 <div>
-                  <div className="flex items-center space-x-3 mb-1">
-                    <h3 className="text-xl font-bold text-white">{item.topic}</h3>
-                    {report.status === 'completed' && <span className="text-emerald-500"><CheckCircle2 size={18} /></span>}
-                    {report.status === 'running' && <span className="text-blue-500"><Loader2 size={18} className="animate-spin" /></span>}
-                    {report.status === 'failed' && <span className="text-rose-500"><AlertTriangle size={18} /></span>}
-                    {report.status === 'cancelled' && <span className="text-slate-500"><Ban size={18} /></span>}
+                  <div className="flex items-center space-x-3 mb-2">
+                    <h3 className="text-2xl font-bold font-serif text-gray-900 tracking-tight">{item.topic}</h3>
                   </div>
-                  <p className="text-sm text-slate-500 font-mono">
-                     ID: {report.id.slice(0, 8)} • {report.articles.length} Sources Found
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${
-                    report.status === 'running' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                    report.status === 'failed' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
-                    report.status === 'cancelled' ? 'bg-slate-500/10 text-slate-400 border-slate-500/20' :
-                    'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                  }`}>
-                    {report.status === 'running' ? report.stage : report.status.toUpperCase()}
+                  <div className="text-xs text-gray-500 font-mono space-x-2">
+                     <span>ID: {report.id.slice(0, 8)}</span>
+                     <span>•</span>
+                     <span>{report.articles.length} Sources Found</span>
                   </div>
                   {report.persianQuery && (
-                    <p className="text-xs text-slate-600 mt-2 font-farsi text-right" dir="rtl">
+                    <p className="text-sm text-gray-600 mt-3 font-farsi" dir="rtl">
                       Query: {report.persianQuery}
                     </p>
                   )}
+                </div>
+                
+                <div className="text-right flex flex-col items-end gap-3">
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider ${
+                    report.status === 'running' ? 'bg-cyan-100 text-cyan-800' :
+                    report.status === 'failed' ? 'bg-red-100 text-red-800' :
+                    report.status === 'cancelled' ? 'bg-stone-200 text-stone-600' :
+                    'bg-emerald-100 text-emerald-800'
+                  }`}>
+                    {report.status === 'running' ? (
+                       <><Loader2 size={12} className="animate-spin"/> {report.stage}</> 
+                    ) : report.status === 'completed' ? (
+                       <><CheckCircle2 size={12} /> COMPLETED</>
+                    ) : (
+                       report.status
+                    )}
+                  </span>
+
                   {!isRunning && (
-                    <div className="mt-3">
-                      <button
-                        onClick={() => onRunTopic(item.id)}
-                        className="inline-flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-200"
-                      >
-                        <Play size={14} />
-                        <span>Run this topic</span>
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => onRunTopic(item.id)}
+                      className="text-xs font-semibold text-gray-500 hover:text-accent flex items-center gap-1 transition-colors"
+                    >
+                      <Play size={12} /> Run Again
+                    </button>
                   )}
                 </div>
               </div>
 
               {/* Report Body */}
-              <div className="p-6">
+              <div className="p-8">
                 {report.error && (
-                  <div className="bg-rose-950/30 border border-rose-900/50 p-4 rounded-lg text-rose-300 text-sm mb-4">
-                    Error: {report.error}
+                  <div className="bg-red-50 border border-red-100 p-4 rounded-md text-red-700 text-sm mb-6 flex items-start gap-2">
+                    <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-semibold">Analysis Failed</p>
+                      <p>{report.error}</p>
+                    </div>
                   </div>
                 )}
 
                 {report.summary ? (
-                  <div className="prose prose-invert prose-sm max-w-none">
+                  <div className="prose prose-slate prose-headings:font-serif prose-headings:text-gray-900 prose-p:text-gray-700 max-w-none">
                     <ReactMarkdown components={MarkdownComponents}>
                       {report.summary}
                     </ReactMarkdown>
                   </div>
                 ) : (
                    report.status === 'running' && (
-                     <div className="h-32 flex items-center justify-center text-slate-600 animate-pulse">
-                        Generating intelligence summary...
+                     <div className="py-12 flex flex-col items-center justify-center text-gray-400">
+                        <p className="animate-pulse font-medium">Generating intelligence summary...</p>
                      </div>
                    )
                 )}
@@ -160,34 +175,33 @@ const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, on
 
               {/* Sources Footer */}
               {report.articles.length > 0 && (
-                <div className="bg-slate-950 p-4 border-t border-slate-800">
-                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Intercepted Media Sources</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="bg-surface-secondary p-6 border-t border-gray-100">
+                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Intercepted Media Sources</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {report.articles.map((article, idx) => (
                       <a 
                         key={idx} 
                         href={article.url} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="flex items-start space-x-2 p-2 rounded hover:bg-slate-900 transition-colors group"
+                        className="flex items-start space-x-3 p-3 bg-white border border-gray-200 rounded-md hover:border-accent hover:bg-accent-light/10 transition-all group"
                       >
-                        <FileText size={14} className="text-slate-600 mt-1 group-hover:text-emerald-500" />
+                        <FileText size={16} className="text-gray-400 mt-0.5 group-hover:text-accent shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-slate-400 font-medium truncate group-hover:text-emerald-400 transition-colors">
+                          <p className="text-sm text-gray-900 font-medium truncate group-hover:text-accent transition-colors leading-snug">
                             {article.title}
                           </p>
-                          <p className="text-[10px] text-slate-600 flex justify-between">
-                            <span>{article.domain}</span>
-                            {article.publishedDate && <span>{article.publishedDate.split('T')[0]}</span>}
-                          </p>
+                          <div className="flex justify-between items-center mt-1">
+                            <span className="text-[11px] text-gray-500">{article.domain}</span>
+                            <span className="text-[10px] text-gray-400">{article.publishedDate ? article.publishedDate.split('T')[0] : ''}</span>
+                          </div>
                         </div>
-                        <ExternalLink size={12} className="text-slate-700 group-hover:text-slate-500" />
                       </a>
                     ))}
                   </div>
                 </div>
               )}
-            </div>
+            </article>
           );
         })}
       </div>

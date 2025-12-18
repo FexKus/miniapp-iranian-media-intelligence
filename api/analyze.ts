@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ArticleResult } from "../types";
 import { readJson, requireEnv } from "./_shared";
 
@@ -17,15 +17,17 @@ export default async function handler(req: Request): Promise<Response> {
     if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
     const apiKey = requireEnv("GEMINI_API_KEY");
-    const model = process.env.GEMINI_ANALYSIS_MODEL || "gemini-3-pro-preview";
+    // Use Gemini 3.0 Pro for advanced intelligence analysis
+    const modelName = process.env.GEMINI_ANALYSIS_MODEL || "gemini-3-pro-preview";
 
     const { topic, articles, domainLeanings } = await readJson<AnalyzeBody>(req);
     if (!topic?.trim()) return new Response("Missing topic", { status: 400 });
     if (!Array.isArray(articles) || articles.length === 0) {
-      return Response.json({ summary: "No relevant articles were found for this topic within the selected sources.", modelUsed: model });
+      return Response.json({ summary: "No relevant articles were found for this topic within the selected sources.", modelUsed: modelName });
     }
 
-    const ai = new GoogleGenAI({ apiKey });
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: modelName });
 
     const getLeaning = (domain: string) => {
       if (!domainLeanings) return "Unknown";
@@ -78,14 +80,13 @@ DATA:
 ${articlesContext}
 `;
 
-    const resp = await ai.models.generateContent({
-      model,
-      contents: prompt,
-    });
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
 
     return Response.json({
-      summary: resp.text || "Analysis complete, but no text was generated.",
-      modelUsed: model,
+      summary: text || "Analysis complete, but no text was generated.",
+      modelUsed: modelName,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";

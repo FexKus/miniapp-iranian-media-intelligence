@@ -20,12 +20,20 @@ export async function searchExa(
   _unusedApiKey: string,
   query: string,
   domains: string[],
-  numResults = 5
+  numResults = 5,
+  startPublishedDate?: string,
+  endPublishedDate?: string
 ): Promise<ArticleResult[]> {
   const resp = await fetch("/api/search", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query, includeDomains: domains, numResults }),
+    body: JSON.stringify({ 
+      query, 
+      includeDomains: domains, 
+      numResults,
+      startPublishedDate,
+      endPublishedDate
+    }),
   });
   if (!resp.ok) {
     const data = await resp.json().catch(() => ({}));

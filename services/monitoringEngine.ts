@@ -55,7 +55,29 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
       await new Promise((resolve) => setTimeout(resolve, 500));
       if (isCancelled()) throw new Error("Cancelled");
 
-      const articles: ArticleResult[] = await searchExa(exaApiKey, persianQuery, activeDomains);
+      // Calculate dates
+      let startPublishedDate: string | undefined;
+      let endPublishedDate: string | undefined;
+
+      if (item.timeRange === 'custom' && item.customStartDate && item.customEndDate) {
+        startPublishedDate = new Date(item.customStartDate).toISOString();
+        endPublishedDate = new Date(item.customEndDate).toISOString();
+      } else {
+        // Default to last 24h
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        startPublishedDate = yesterday.toISOString();
+        // endPublishedDate left undefined means "now"
+      }
+
+      const articles: ArticleResult[] = await searchExa(
+        exaApiKey, 
+        persianQuery, 
+        activeDomains, 
+        5, 
+        startPublishedDate, 
+        endPublishedDate
+      );
       if (isCancelled()) throw new Error("Cancelled");
       onReportUpdate(item.id, { articles, stage: "Analyzing Intelligence..." });
 

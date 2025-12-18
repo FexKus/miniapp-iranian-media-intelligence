@@ -14,18 +14,20 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col h-screen fixed left-0 top-0 z-10">
-      <div className="p-6 border-b border-slate-800 flex items-center space-x-3">
-        <div className="bg-emerald-600 p-2 rounded-lg">
-          <Activity className="w-6 h-6 text-white" />
+    <aside className="w-[260px] bg-white border-r-2 border-accent flex flex-col h-screen fixed left-0 top-0 z-50 font-sans shadow-lg">
+      <div className="p-8 border-b border-gray-100">
+        <div className="flex items-center space-x-3 mb-2">
+          <div className="w-9 h-9 bg-accent rounded-md flex items-center justify-center text-white shrink-0">
+            <Activity size={20} />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 font-serif tracking-tight leading-none">Media Intel</h1>
+          </div>
         </div>
-        <div>
-          <h1 className="text-lg font-bold text-white tracking-tight">INTEL<span className="text-emerald-500">DASH</span></h1>
-          <p className="text-xs text-slate-400">Iranian Media Monitor</p>
-        </div>
+        <p className="text-xs text-gray-500 ml-[48px]">Iranian Media Monitor</p>
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-6 space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -33,23 +35,23 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium ${
                 isActive
-                  ? 'bg-slate-800 text-emerald-400 border border-slate-700 shadow-sm'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                  ? 'bg-accent-light text-accent border border-red-200 shadow-sm font-semibold'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
-              <Icon size={20} />
-              <span className="font-medium text-sm">{item.label}</span>
+              <Icon size={20} className={isActive ? "stroke-[2.5px]" : "stroke-[2px]"} />
+              <span className="text-[15px]">{item.label}</span>
             </button>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-slate-800">
-        <div className="flex items-center space-x-3 px-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-          <span className="text-xs text-slate-500 font-mono">SYSTEM OPERATIONAL</span>
+      <div className="p-8 border-t border-gray-100">
+        <div className="flex items-center space-x-3 text-xs font-mono text-gray-500">
+          <div className="w-2 h-2 rounded-full bg-emerald-600 animate-[pulse_2s_ease-in-out_infinite]"></div>
+          <span>SYSTEM OPERATIONAL</span>
         </div>
       </div>
     </aside>

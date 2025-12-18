@@ -94,10 +94,10 @@ const App: React.FC = () => {
   // --- Render ---
 
   return (
-    <div className="flex min-h-screen bg-slate-950 text-slate-200 font-sans">
+    <div className="flex min-h-screen bg-background text-text-primary font-sans">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      <main className="flex-1 ml-64 p-8 overflow-y-auto h-screen">
+      <main className="flex-1 ml-[260px] p-8 md:p-12 overflow-y-auto h-screen">
         {activeTab === 'dashboard' && (
           <Dashboard 
             watchlist={watchlist} 
@@ -115,7 +115,11 @@ const App: React.FC = () => {
           <Watchlist watchlist={watchlist} setWatchlist={setWatchlist} />
         )}
         {activeTab === 'sources' && (
-          <Sources sources={sources} toggleSource={toggleSource} />
+          <Sources 
+            sources={sources} 
+            toggleSource={toggleSource} 
+            setSources={setSources}
+          />
         )}
       </main>
     </div>

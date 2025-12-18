@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iranian Media Intelligence - Light Design Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Color Palette - Warm, Professional, Editorial with Red Accents */
+            --color-background: #fafaf9;
+            --color-surface: #ffffff;
+            --color-surface-secondary: #f5f5f4;
+            --color-border: #dc2626;
+            --color-border-light: #fca5a5;
+
+            --color-text-primary: #0a0a0a;
+            --color-text-secondary: #404040;
+            --color-text-tertiary: #737373;
+
+            --color-accent: #dc2626;
+            --color-accent-light: #fee2e2;
+            --color-accent-hover: #b91c1c;
+
+            --color-status-running: #0891b2;
+            --color-status-completed: #059669;
+            --color-status-failed: #dc2626;
+            --color-status-cancelled: #78716c;
+
+            /* Typography */
+            --font-serif: 'Crimson Pro', Georgia, serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-farsi: 'Vazirmatn', sans-serif;
+
+            /* Spacing */
+            --spacing-unit: 8px;
+
+            /* Shadows - Subtle */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--color-background);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--color-surface);
+            border-right: 2px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: calc(var(--spacing-unit) * 4);
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit) * 1.5);
+            margin-bottom: calc(var(--spacing-unit) * 1);
+        }
+
+        .sidebar-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--color-accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .sidebar-title {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+            margin-left: calc(var(--spacing-unit) * 6.5);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: calc(var(--spacing-unit) * 3);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit) * 1.5);
+            padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2);
+            margin-bottom: calc(var(--spacing-unit) * 1);
+            border-radius: 6px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: var(--color-surface-secondary);
+            color: var(--color-text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+            border-color: var(--color-border-light);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            padding: calc(var(--spacing-unit) * 3);
+            border-top: 1px solid var(--color-border-light);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit) * 1.5);
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #059669;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Layout */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: calc(var(--spacing-unit) * 6) calc(var(--spacing-unit) * 3);
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: calc(var(--spacing-unit) * 8);
+            padding-bottom: calc(var(--spacing-unit) * 6);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .site-title {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 1);
+            letter-spacing: -0.02em;
+        }
+
+        .site-subtitle {
+            font-size: 1.125rem;
+            color: var(--color-text-secondary);
+            font-weight: 400;
+            max-width: 600px;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: calc(var(--spacing-unit) * 6);
+            padding-bottom: calc(var(--spacing-unit) * 4);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .dashboard-title {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 1);
+            letter-spacing: -0.01em;
+        }
+
+        .dashboard-meta {
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary);
+        }
+
+        .dashboard-meta strong {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: var(--font-sans);
+            font-size: 0.9375rem;
+            font-weight: 500;
+            padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit) * 1);
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--color-accent-hover);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            background: var(--color-text-tertiary);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-text-secondary);
+            background: var(--color-surface-secondary);
+        }
+
+        .btn-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Report Cards */
+        .reports-list {
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing-unit) * 5);
+        }
+
+        .report-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .report-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .report-header {
+            padding: calc(var(--spacing-unit) * 4);
+            border-bottom: 1px solid var(--color-border-light);
+            background: var(--color-surface-secondary);
+        }
+
+        .report-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: calc(var(--spacing-unit) * 1.5);
+        }
+
+        .report-title {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            letter-spacing: -0.01em;
+            margin-bottom: calc(var(--spacing-unit) * 1);
+        }
+
+        .report-meta {
+            font-size: 0.8125rem;
+            color: var(--color-text-tertiary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5);
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: calc(var(--spacing-unit) * 0.75);
+        }
+
+        .status-badge.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.running {
+            background: #cffafe;
+            color: #0e7490;
+        }
+
+        .status-badge.failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.cancelled {
+            background: #e7e5e4;
+            color: #57534e;
+        }
+
+        .persian-query {
+            font-family: var(--font-farsi);
+            font-size: 0.8125rem;
+            color: var(--color-text-secondary);
+            direction: rtl;
+            margin-top: calc(var(--spacing-unit) * 1);
+        }
+
+        /* Report Body */
+        .report-body {
+            padding: calc(var(--spacing-unit) * 5);
+        }
+
+        .report-summary {
+            font-size: 1rem;
+            line-height: 1.75;
+            color: var(--color-text-primary);
+        }
+
+        .report-summary h3 {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: calc(var(--spacing-unit) * 4);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            color: var(--color-text-primary);
+        }
+
+        .report-summary h4 {
+            font-family: var(--font-serif);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: calc(var(--spacing-unit) * 3);
+            margin-bottom: calc(var(--spacing-unit) * 1.5);
+            color: var(--color-text-primary);
+        }
+
+        .report-summary p {
+            margin-bottom: calc(var(--spacing-unit) * 2.5);
+            color: var(--color-text-secondary);
+        }
+
+        .report-summary strong {
+            font-weight: 600;
+            color: var(--color-accent);
+            border-bottom: 2px solid var(--color-border-light);
+            padding-bottom: 1px;
+        }
+
+        .report-summary ul {
+            list-style: none;
+            margin: calc(var(--spacing-unit) * 2) 0;
+            padding-left: calc(var(--spacing-unit) * 3);
+        }
+
+        .report-summary li {
+            position: relative;
+            margin-bottom: calc(var(--spacing-unit) * 1.5);
+            color: var(--color-text-secondary);
+        }
+
+        .report-summary li::before {
+            content: '•';
+            position: absolute;
+            left: calc(var(--spacing-unit) * -3);
+            color: var(--color-accent);
+            font-weight: bold;
+        }
+
+        /* Sources Footer */
+        .report-sources {
+            padding: calc(var(--spacing-unit) * 4);
+            background: var(--color-surface-secondary);
+            border-top: 1px solid var(--color-border-light);
+        }
+
+        .sources-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-text-tertiary);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: calc(var(--spacing-unit) * 1.5);
+        }
+
+        .source-item {
+            display: flex;
+            gap: calc(var(--spacing-unit) * 1.5);
+            padding: calc(var(--spacing-unit) * 1.5);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-light);
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .source-item:hover {
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+            transform: translateX(2px);
+        }
+
+        .source-icon {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+            opacity: 0.4;
+        }
+
+        .source-item:hover .source-icon {
+            opacity: 0.8;
+        }
+
+        .source-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .source-title {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            margin-bottom: calc(var(--spacing-unit) * 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .source-meta {
+            font-size: 0.6875rem;
+            color: var(--color-text-tertiary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Empty State */
+        .empty-state {
+            background: var(--color-surface);
+            border: 2px dashed var(--color-border);
+            border-radius: 8px;
+            padding: calc(var(--spacing-unit) * 6);
+            text-align: center;
+        }
+
+        .empty-state-title {
+            font-family: var(--font-serif);
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 1);
+        }
+
+        .empty-state-text {
+            font-size: 0.875rem;
+            color: var(--color-text-tertiary);
+        }
+
+        /* Animations */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 2px solid var(--color-border);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .container {
+                padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 2);
+            }
+
+            .site-title {
+                font-size: 2rem;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: calc(var(--spacing-unit) * 3);
+            }
+
+            .dashboard-title {
+                font-size: 1.5rem;
+            }
+
+            .sources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/>
+                    </svg>
+                </div>
+                <h1 class="sidebar-title">Media Intel</h1>
+            </div>
+            <p class="sidebar-subtitle">Iranian Media Monitor</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                Watchlist
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                </svg>
+                Media Sources
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>SYSTEM OPERATIONAL</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+        <!-- Site Header -->
+        <header class="header">
+            <h1 class="site-title">Iranian Media Intelligence</h1>
+            <p class="site-subtitle">Monitoring and analyzing media coverage across Iranian news outlets. Real-time intelligence on emerging narratives and geopolitical developments.</p>
+        </header>
+
+        <!-- Dashboard -->
+        <div class="dashboard-header">
+            <div>
+                <h2 class="dashboard-title">Intelligence Dashboard</h2>
+                <p class="dashboard-meta">Monitoring <strong>3</strong> objectives across active channels.</p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-primary">
+                    <svg class="btn-icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    Run Monitoring
+                </button>
+            </div>
+        </div>
+
+        <!-- Reports -->
+        <div class="reports-list">
+            <!-- Report 1: Completed -->
+            <article class="report-card">
+                <div class="report-header">
+                    <div class="report-title-row">
+                        <div style="flex: 1;">
+                            <h3 class="report-title">Iran-Israel Relations</h3>
+                            <p class="report-meta">ID: 3c04f7d8 • 12 Sources Found</p>
+                            <p class="persian-query">Query: روابط ایران و اسرائیل</p>
+                        </div>
+                        <span class="status-badge completed">
+                            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Completed
+                        </span>
+                    </div>
+                </div>
+
+                <div class="report-body">
+                    <div class="report-summary">
+                        <p>Iranian state media continues to emphasize a hardline stance against Israel, framing recent developments as evidence of "Zionist aggression" and reaffirming Tehran's support for Palestinian resistance movements. Coverage across monitored outlets shows coordinated messaging around three key themes:</p>
+
+                        <h4>Regional Security Dynamics</h4>
+                        <p>State-aligned sources highlight Iran's <strong>defensive capabilities</strong> and strategic partnerships with regional allies. Reports emphasize military preparedness while portraying diplomatic channels as secondary to deterrence strategies.</p>
+
+                        <h4>International Perception</h4>
+                        <p>Analysis reveals attempts to frame the conflict within broader anti-colonial narratives, positioning Iran as a defender of regional sovereignty against Western-backed interventions. Multiple outlets reference historical grievances and international law violations.</p>
+
+                        <h4>Domestic Messaging</h4>
+                        <p>Internal coverage focuses on national unity and resilience, with less emphasis on economic impacts. The narrative prioritizes ideological consistency over pragmatic considerations in foreign policy discussions.</p>
+
+                        <p>This intelligence synthesis suggests continued escalatory rhetoric without immediate actionable threats, though the coordinated nature of messaging indicates centralized information control and strategic communication planning.</p>
+                    </div>
+                </div>
+
+                <div class="report-sources">
+                    <h4 class="sources-title">Intercepted Media Sources</h4>
+                    <div class="sources-grid">
+                        <a href="#" class="source-item">
+                            <svg class="source-icon" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                            </svg>
+                            <div class="source-content">
+                                <div class="source-title">Iran's Strategic Position in Regional Security Framework</div>
+                                <div class="source-meta">
+                                    <span>presstv.ir</span>
+                                    <span>2025-12-15</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="#" class="source-item">
+                            <svg class="source-icon" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                            </svg>
+                            <div class="source-content">
+                                <div class="source-title">Analysis: Tehran's Response to Recent Developments</div>
+                                <div class="source-meta">
+                                    <span>tehrantimes.com</span>
+                                    <span>2025-12-14</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="#" class="source-item">
+                            <svg class="source-icon" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                            </svg>
+                            <div class="source-content">
+                                <div class="source-title">Regional Alliances and Defense Cooperation Initiatives</div>
+                                <div class="source-meta">
+                                    <span>farsnews.ir</span>
+                                    <span>2025-12-14</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="#" class="source-item">
+                            <svg class="source-icon" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                            </svg>
+                            <div class="source-content">
+                                <div class="source-title">Supreme Leader's Address on National Security Policy</div>
+                                <div class="source-meta">
+                                    <span>leader.ir</span>
+                                    <span>2025-12-13</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Report 2: Running -->
+            <article class="report-card">
+                <div class="report-header">
+                    <div class="report-title-row">
+                        <div style="flex: 1;">
+                            <h3 class="report-title">Nuclear Program Developments</h3>
+                            <p class="report-meta">ID: a92f4e1c • 8 Sources Found</p>
+                            <p class="persian-query">Query: برنامه هسته‌ای ایران</p>
+                        </div>
+                        <span class="status-badge running">
+                            <svg class="spinner" width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+                            </svg>
+                            Analyzing
+                        </span>
+                    </div>
+                </div>
+
+                <div class="report-body">
+                    <div style="padding: 64px; text-align: center; color: var(--color-text-tertiary);">
+                        <p style="animation: pulse 2s ease-in-out infinite;">Generating intelligence summary...</p>
+                    </div>
+                </div>
+
+                <div class="report-sources">
+                    <h4 class="sources-title">Intercepted Media Sources</h4>
+                    <div class="sources-grid">
+                        <a href="#" class="source-item">
+                            <svg class="source-icon" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                            </svg>
+                            <div class="source-content">
+                                <div class="source-title">IAEA Monitoring and Compliance Reports</div>
+                                <div class="source-meta">
+                                    <span>irna.ir</span>
+                                    <span>2025-12-17</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="#" class="source-item">
+                            <svg class="source-icon" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                            </svg>
+                            <div class="source-content">
+                                <div class="source-title">Enrichment Activities and International Negotiations</div>
+                                <div class="source-meta">
+                                    <span>tasnimnews.com</span>
+                                    <span>2025-12-16</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Report 3: Empty State -->
+            <div class="empty-state">
+                <h3 class="empty-state-title">Economic Sanctions Impact</h3>
+                <p class="empty-state-text">No analysis data available. Run monitoring to generate intelligence.</p>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+    </style>
+</body>
+</html>

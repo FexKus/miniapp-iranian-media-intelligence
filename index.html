@@ -4,16 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iranian Media Intelligence</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              slate: {
-                850: '#151f32',
-                950: '#020617',
+              background: '#fafaf9',
+              surface: '#ffffff',
+              'surface-secondary': '#f5f5f4',
+              border: '#dc2626',
+              'border-light': '#fca5a5',
+              accent: {
+                DEFAULT: '#dc2626',
+                light: '#fee2e2',
+                hover: '#b91c1c',
+              },
+              text: {
+                primary: '#0a0a0a',
+                secondary: '#404040',
+                tertiary: '#737373',
               }
+            },
+            fontFamily: {
+              serif: ['Crimson Pro', 'Georgia', 'serif'],
+              sans: ['Inter', '-apple-system', 'sans-serif'],
+              farsi: ['Vazirmatn', 'sans-serif'],
             }
           }
         }
@@ -21,8 +43,9 @@
     </script>
     <style>
       body {
-        background-color: #020617; /* slate-950 */
-        color: #e2e8f0; /* slate-200 */
+        background-color: #fafaf9;
+        color: #0a0a0a;
+        font-family: 'Inter', sans-serif;
       }
       /* Custom scrollbar for dashboard */
       ::-webkit-scrollbar {
@@ -30,14 +53,14 @@
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #0f172a; 
+        background: #f5f5f4; 
       }
       ::-webkit-scrollbar-thumb {
-        background: #334155; 
+        background: #d4d4d4; 
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #475569; 
+        background: #a3a3a3; 
       }
     </style>
   <script type="importmap">

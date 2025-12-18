@@ -17,7 +17,7 @@ export default async function handler(req: Request): Promise<Response> {
     if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
     const apiKey = requireEnv("EXA_API_KEY");
-    const { query, includeDomains, numResults } = await readJson<SearchBody>(req);
+    const { query, includeDomains, numResults, startPublishedDate, endPublishedDate } = await readJson<SearchBody & { startPublishedDate?: string; endPublishedDate?: string }>(req);
     if (!query?.trim()) return new Response("Missing query", { status: 400 });
 
     const allowed = new Set(INITIAL_SOURCES.map((s) => normalizeHostname(s.domain)));
@@ -34,6 +34,8 @@ export default async function handler(req: Request): Promise<Response> {
       includeDomains: gatedDomains,
       numResults: Math.max(1, Math.min(20, numResults ?? 5)),
       contents: { text: true },
+      startPublishedDate,
+      endPublishedDate,
     };
 
     const resp = await fetch("https://api.exa.ai/search", {

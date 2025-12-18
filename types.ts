@@ -4,6 +4,7 @@ export interface MediaSource {
   name: string;
   leaning: 'Principlist' | 'Reformist' | 'State' | 'Economic' | 'Moderate';
   active: boolean;
+  description?: string;
 }
 
 export interface WatchlistItem {
