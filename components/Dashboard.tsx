@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { WatchlistItem, Report } from '../types';
-import { Play, Loader2, FileText, ExternalLink, AlertTriangle, CheckCircle2, Ban } from 'lucide-react';
+import { Play, Loader2, FileText, ExternalLink, AlertTriangle, CheckCircle2, Ban, Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface DashboardProps {
@@ -13,7 +13,15 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, onRunMonitoring, onRunTopic, onCancelMonitoring }) => {
-  
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyReport = (report: Report) => {
+    const content = `${report.topic}\n\n${report.summary || 'No analysis available'}\n\nSources:\n${report.articles.map(a => `- ${a.title} (${a.domain}) - ${a.url}`).join('\n')}`;
+    navigator.clipboard.writeText(content);
+    setCopiedId(report.id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   // Helper to render markdown content safely and cleanly
   const MarkdownComponents = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,6 +38,15 @@ const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, on
     li: ({ node, ...props }: any) => <li className="pl-1" {...props} />,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     p: ({ node, ...props }: any) => <p className="text-gray-700 leading-relaxed mb-4" {...props} />,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    a: ({ node, ...props }: any) => (
+      <a
+        className="text-accent hover:text-accent-hover underline font-medium"
+        target="_blank"
+        rel="noreferrer"
+        {...props}
+      />
+    ),
   };
 
   return (
@@ -127,7 +144,7 @@ const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, on
                     'bg-emerald-100 text-emerald-800'
                   }`}>
                     {report.status === 'running' ? (
-                       <><Loader2 size={12} className="animate-spin"/> {report.stage}</> 
+                       <><Loader2 size={12} className="animate-spin"/> {report.stage}</>
                     ) : report.status === 'completed' ? (
                        <><CheckCircle2 size={12} /> COMPLETED</>
                     ) : (
@@ -135,14 +152,29 @@ const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, on
                     )}
                   </span>
 
-                  {!isRunning && (
-                    <button
-                      onClick={() => onRunTopic(item.id)}
-                      className="text-xs font-semibold text-gray-500 hover:text-accent flex items-center gap-1 transition-colors"
-                    >
-                      <Play size={12} /> Run Again
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {report.summary && (
+                      <button
+                        onClick={() => handleCopyReport(report)}
+                        className="text-xs font-semibold text-gray-500 hover:text-accent flex items-center gap-1 transition-colors"
+                        title="Copy full report"
+                      >
+                        {copiedId === report.id ? (
+                          <><Check size={12} className="text-emerald-600" /> Copied!</>
+                        ) : (
+                          <><Copy size={12} /> Copy Report</>
+                        )}
+                      </button>
+                    )}
+                    {!isRunning && (
+                      <button
+                        onClick={() => onRunTopic(item.id)}
+                        className="text-xs font-semibold text-gray-500 hover:text-accent flex items-center gap-1 transition-colors"
+                      >
+                        <Play size={12} /> Run Again
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
