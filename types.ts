@@ -11,6 +11,10 @@ export interface WatchlistItem {
   id: string;
   topic: string;
   description: string;
+  persianQuery?: string; // Optional pre-optimized Persian search query
+  timeRange?: 'last24h' | 'last7d' | 'last30d' | 'custom';
+  customStartDate?: string;
+  customEndDate?: string;
 }
 
 export interface ArticleResult {

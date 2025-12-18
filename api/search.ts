@@ -3,7 +3,7 @@ import { ArticleResult } from "../types.js";
 import { normalizeHostname, readJson, requireEnv, safeHostnameFromUrl } from "./_shared.js";
 
 export const config = {
-  runtime: "nodejs",
+  runtime: "edge",
 };
 
 type SearchBody = {

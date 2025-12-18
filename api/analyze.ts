@@ -3,7 +3,7 @@ import { ArticleResult } from "../types.js";
 import { readJson, requireEnv } from "./_shared.js";
 
 export const config = {
-  runtime: "nodejs",
+  runtime: "edge",
 };
 
 type AnalyzeBody = {

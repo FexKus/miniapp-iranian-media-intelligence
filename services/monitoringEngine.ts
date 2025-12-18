@@ -46,10 +46,18 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
     onReportInit(report);
 
     try {
-      onReportUpdate(item.id, { stage: "Translating Topic..." });
-      const persianQuery = await translateQuery(geminiApiKey, item.topic, geminiTranslationModel);
-      if (isCancelled()) throw new Error("Cancelled");
-      onReportUpdate(item.id, { persianQuery, stage: "Scanning Media..." });
+      // Use pre-defined Persian query if available, otherwise translate
+      let persianQuery: string;
+      if (item.persianQuery) {
+        console.log(`[Monitoring] Using pre-defined Persian query for: ${item.topic}`);
+        persianQuery = item.persianQuery;
+        onReportUpdate(item.id, { persianQuery, stage: "Scanning Media..." });
+      } else {
+        onReportUpdate(item.id, { stage: "Translating Topic..." });
+        persianQuery = await translateQuery(geminiApiKey, item.topic, geminiTranslationModel);
+        if (isCancelled()) throw new Error("Cancelled");
+        onReportUpdate(item.id, { persianQuery, stage: "Scanning Media..." });
+      }
 
       // Small delay to be nice to APIs
       await new Promise((resolve) => setTimeout(resolve, 500));
