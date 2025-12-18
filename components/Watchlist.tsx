@@ -11,14 +11,14 @@ const Watchlist: React.FC<WatchlistProps> = ({ watchlist, setWatchlist }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newTopic, setNewTopic] = useState('');
   const [newDesc, setNewDesc] = useState('');
-  const [newTimeRange, setNewTimeRange] = useState<'24h' | 'custom'>('24h');
+  const [newTimeRange, setNewTimeRange] = useState<'last24h' | 'last7d' | 'last30d' | 'custom'>('last7d');
   const [newStartDate, setNewStartDate] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTopic, setEditTopic] = useState('');
   const [editDesc, setEditDesc] = useState('');
-  const [editTimeRange, setEditTimeRange] = useState<'24h' | 'custom'>('24h');
+  const [editTimeRange, setEditTimeRange] = useState<'last24h' | 'last7d' | 'last30d' | 'custom'>('last7d');
   const [editStartDate, setEditStartDate] = useState('');
   const [editEndDate, setEditEndDate] = useState('');
 
@@ -35,7 +35,7 @@ const Watchlist: React.FC<WatchlistProps> = ({ watchlist, setWatchlist }) => {
     setWatchlist([...watchlist, newItem]);
     setNewTopic('');
     setNewDesc('');
-    setNewTimeRange('24h');
+    setNewTimeRange('last7d');
     setNewStartDate('');
     setNewEndDate('');
     setIsAdding(false);
@@ -49,7 +49,7 @@ const Watchlist: React.FC<WatchlistProps> = ({ watchlist, setWatchlist }) => {
     setEditingId(item.id);
     setEditTopic(item.topic);
     setEditDesc(item.description);
-    setEditTimeRange(item.timeRange || '24h');
+    setEditTimeRange(item.timeRange || 'last7d');
     setEditStartDate(item.customStartDate || '');
     setEditEndDate(item.customEndDate || '');
   };
@@ -58,7 +58,7 @@ const Watchlist: React.FC<WatchlistProps> = ({ watchlist, setWatchlist }) => {
     setEditingId(null);
     setEditTopic('');
     setEditDesc('');
-    setEditTimeRange('24h');
+    setEditTimeRange('last7d');
     setEditStartDate('');
     setEditEndDate('');
   };
@@ -128,23 +128,34 @@ const Watchlist: React.FC<WatchlistProps> = ({ watchlist, setWatchlist }) => {
 
             <div>
               <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Monitoring Period</label>
-              <div className="flex items-center space-x-4 mb-3">
+              <div className="flex items-center space-x-3 mb-3">
                 <button
-                  onClick={() => setNewTimeRange('24h')}
+                  onClick={() => setNewTimeRange('last24h')}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    newTimeRange === '24h' 
-                      ? 'bg-accent text-white shadow-sm' 
+                    newTimeRange === 'last24h'
+                      ? 'bg-accent text-white shadow-sm'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
                   <Clock size={16} />
-                  <span>Last 24 Hours</span>
+                  <span>24 Hours</span>
+                </button>
+                <button
+                  onClick={() => setNewTimeRange('last7d')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    newTimeRange === 'last7d'
+                      ? 'bg-accent text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Clock size={16} />
+                  <span>7 Days</span>
                 </button>
                 <button
                   onClick={() => setNewTimeRange('custom')}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    newTimeRange === 'custom' 
-                      ? 'bg-accent text-white shadow-sm' 
+                    newTimeRange === 'custom'
+                      ? 'bg-accent text-white shadow-sm'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -221,14 +232,22 @@ const Watchlist: React.FC<WatchlistProps> = ({ watchlist, setWatchlist }) => {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Monitoring Period</label>
-                    <div className="flex items-center space-x-3 mb-3">
+                    <div className="flex items-center space-x-2 mb-3">
                       <button
-                        onClick={() => setEditTimeRange('24h')}
+                        onClick={() => setEditTimeRange('last24h')}
                         className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                          editTimeRange === '24h' ? 'bg-accent text-white' : 'bg-gray-100 text-gray-600'
+                          editTimeRange === 'last24h' ? 'bg-accent text-white' : 'bg-gray-100 text-gray-600'
                         }`}
                       >
-                        Last 24 Hours
+                        24 Hours
+                      </button>
+                      <button
+                        onClick={() => setEditTimeRange('last7d')}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          editTimeRange === 'last7d' ? 'bg-accent text-white' : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        7 Days
                       </button>
                       <button
                         onClick={() => setEditTimeRange('custom')}
@@ -285,6 +304,11 @@ const Watchlist: React.FC<WatchlistProps> = ({ watchlist, setWatchlist }) => {
                         <>
                           <Calendar size={10} className="mr-1" />
                           {item.customStartDate} to {item.customEndDate}
+                        </>
+                      ) : item.timeRange === 'last7d' ? (
+                        <>
+                          <Clock size={10} className="mr-1" />
+                          Last 7 days
                         </>
                       ) : (
                         <>

@@ -29,18 +29,21 @@ export const INITIAL_WATCHLIST: WatchlistItem[] = [
     topic: 'IAEA pressure, enrichment steps, and sanctions snapback risk',
     description: 'Track how outlets frame inspections/IAEA resolutions, Iran\'s nuclear steps (enrichment/centrifuges), and snapback/"trigger mechanism" sanctions—compare principlist vs reformist vs state narratives.',
     persianQuery: 'آژانس بین‌المللی انرژی اتمی پادمان غنی‌سازی سانتریفیوژ برجام مکانیسم ماشه اسنپ‌بک تحریم',
+    timeRange: 'last7d',
   },
   {
     id: 'w2',
     topic: 'Hijab enforcement: "Chastity & Hijab" law, policing methods, and public pushback',
     description: 'Monitor legal/policing developments (bill text, penalties, enforcement tools like SMS/towing) and reported public responses; watch disagreements on legality/effectiveness/social stability impacts.',
     persianQuery: 'قانون عفاف و حجاب طرح نور گشت ارشاد کشف حجاب توقیف خودرو پیامک جرایم واکنش',
+    timeRange: 'last7d',
   },
   {
     id: 'w3',
     topic: 'Currency, inflation, and subsidy/price-policy changes',
     description: 'Capture daily coverage: FX moves, inflation, subsidy or "preferred FX" changes (مثل ارز ۲۸۵۰۰) and knock-on effects on staples/housing/gold—high hit-rate for demos.',
     persianQuery: 'نرخ دلار بازار آزاد تورم گرانی ارز ۲۸۵۰۰ حذف ارز ترجیحی قیمت کالاهای اساسی طلا مسکن',
+    timeRange: 'last7d',
   },
 ];
 

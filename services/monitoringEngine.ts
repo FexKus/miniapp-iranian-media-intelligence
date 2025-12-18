@@ -63,20 +63,28 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
       await new Promise((resolve) => setTimeout(resolve, 500));
       if (isCancelled()) throw new Error("Cancelled");
 
-      // Calculate dates
+      // Calculate dates based on time range
       let startPublishedDate: string | undefined;
       let endPublishedDate: string | undefined;
 
       if (item.timeRange === 'custom' && item.customStartDate && item.customEndDate) {
         startPublishedDate = new Date(item.customStartDate).toISOString();
         endPublishedDate = new Date(item.customEndDate).toISOString();
+      } else if (item.timeRange === 'last24h') {
+        const oneDayAgo = new Date();
+        oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+        startPublishedDate = oneDayAgo.toISOString();
+      } else if (item.timeRange === 'last30d') {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        startPublishedDate = thirtyDaysAgo.toISOString();
       } else {
-        // Default to last 7 days for better article coverage
+        // Default to last 7 days (includes last7d and undefined)
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         startPublishedDate = sevenDaysAgo.toISOString();
-        // endPublishedDate left undefined means "now"
       }
+      // endPublishedDate left undefined means "now"
 
       const articles: ArticleResult[] = await searchExa(
         exaApiKey, 

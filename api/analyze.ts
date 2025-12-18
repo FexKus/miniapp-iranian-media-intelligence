@@ -4,6 +4,7 @@ import { readJson, requireEnv } from "./_shared.js";
 
 export const config = {
   runtime: "edge",
+  maxDuration: 60, // Allow up to 60 seconds for thorough analysis
 };
 
 type AnalyzeBody = {
@@ -38,7 +39,8 @@ export default async function handler(req: Request): Promise<Response> {
     const articlesContext = articles
       .map((a, i) => {
         const leaning = getLeaning(a.domain);
-        return `Source ${i + 1}\nDomain: ${a.domain}\nLeaning: ${leaning}\nTitle: ${a.title}\nURL: ${a.url}\nContent (truncated): ${a.text.substring(0, 3000)}...`;
+        // Include full article text for thorough analysis (up to 5000 chars per article)
+        return `Source ${i + 1}\nDomain: ${a.domain}\nLeaning: ${leaning}\nTitle: ${a.title}\nURL: ${a.url}\nContent: ${a.text.substring(0, 5000)}${a.text.length > 5000 ? '...' : ''}`;
       })
       .join("\n\n---\n\n");
 
