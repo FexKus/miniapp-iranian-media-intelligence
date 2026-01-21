@@ -39,8 +39,8 @@ export default async function handler(req: Request): Promise<Response> {
     const articlesContext = articles
       .map((a, i) => {
         const leaning = getLeaning(a.domain);
-        // Optimized for quality + reliability: 3500 chars per article
-        return `Source ${i + 1}\nDomain: ${a.domain}\nLeaning: ${leaning}\nTitle: ${a.title}\nURL: ${a.url}\nContent: ${a.text.substring(0, 3500)}${a.text.length > 3500 ? '...' : ''}`;
+        // Reduced to 2000 chars for reliable Edge Function completion
+        return `Source ${i + 1}\nDomain: ${a.domain}\nLeaning: ${leaning}\nTitle: ${a.title}\nURL: ${a.url}\nContent: ${a.text.substring(0, 2000)}${a.text.length > 2000 ? '...' : ''}`;
       })
       .join("\n\n---\n\n");
 
@@ -115,64 +115,9 @@ ${articlesContext}
     // P2.10: Soft consistency warnings (entity grounding)
     const consistencyWarnings = buildConsistencyWarnings(text, articles);
 
-    // P2.11: Evaluator agent (faithfulness + citation coverage) - always on
-    let evaluatorResult: {
-      citationScore: number;
-      faithfulnessScore: number;
-      issues: Array<{ claim: string; issue: string }>;
-    } | undefined;
-
-    if (text && articles.length > 0) {
-      const evaluatorContext = articles
-        .map((a, i) => `Source ${i + 1}\nTitle: ${a.title}\nURL: ${a.url}\nContent: ${a.text.substring(0, 1200)}${a.text.length > 1200 ? '...' : ''}`)
-        .join("\n\n---\n\n");
-
-      const evaluatorPrompt = `
-You are a strict evaluator of an intelligence briefing. Only judge citation coverage and faithfulness to sources.
-
-TOPIC: ${topic}
-
-BRIEFING:
-${text}
-
-SOURCES:
-${evaluatorContext}
-
-Return JSON only with this exact shape:
-{
-  "citationScore": number (0-100),
-  "faithfulnessScore": number (0-100),
-  "issues": [{ "claim": string, "issue": string }]
-}
-`;
-
-      try {
-        const evaluatorResponse = await withRetryAsync(() => model.generateContent(evaluatorPrompt));
-        const evaluatorText = evaluatorResponse.response.text();
-        const jsonMatch = evaluatorText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          if (
-            typeof parsed?.citationScore === 'number' &&
-            typeof parsed?.faithfulnessScore === 'number' &&
-            Array.isArray(parsed?.issues)
-          ) {
-            evaluatorResult = {
-              citationScore: Math.max(0, Math.min(100, parsed.citationScore)),
-              faithfulnessScore: Math.max(0, Math.min(100, parsed.faithfulnessScore)),
-              issues: parsed.issues
-                .filter((issue: { claim: string; issue: string }) => issue?.claim && issue?.issue)
-                .map((issue: { claim: string; issue: string }) => ({
-                  claim: String(issue.claim),
-                  issue: String(issue.issue),
-                })),
-            };
-          }
-        }
-      } catch (error) {
-        console.warn('[Evaluator] Skipping evaluator result due to error', error);
-      }
-    }
+    // P2.11: Evaluator agent - DISABLED for Edge Function reliability
+    // Will be re-enabled with Firebase + Inngest background processing
+    const evaluatorResult = undefined;
 
     return Response.json({
       summary: text || "Analysis complete, but no text was generated.",
