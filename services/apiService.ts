@@ -1,8 +1,13 @@
-import { ArticleResult } from "../types";
+import { ArticleResult, SearchResponse } from "../types";
 
 // Client calls same-origin serverless endpoints on Vercel.
 
-export async function translateQuery(_unusedApiKey: string, topic: string, _unusedModel: string): Promise<string> {
+export interface TranslateResult {
+  query: string;
+  warnings?: string[];
+}
+
+export async function translateQuery(_unusedApiKey: string, topic: string, _unusedModel: string): Promise<TranslateResult> {
   const resp = await fetch("/api/translate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -13,7 +18,10 @@ export async function translateQuery(_unusedApiKey: string, topic: string, _unus
     throw new Error(data?.error || `Translate failed: ${resp.status} ${resp.statusText}`);
   }
   const data = await resp.json();
-  return (data?.persianQuery || topic).trim();
+  return {
+    query: (data?.persianQuery || topic).trim(),
+    warnings: data?.queryWarnings,
+  };
 }
 
 export async function searchExa(
@@ -23,13 +31,13 @@ export async function searchExa(
   numResults = 5,
   startPublishedDate?: string,
   endPublishedDate?: string
-): Promise<ArticleResult[]> {
+): Promise<SearchResponse> {
   const resp = await fetch("/api/search", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ 
-      query, 
-      includeDomains: domains, 
+    body: JSON.stringify({
+      query,
+      includeDomains: domains,
       numResults,
       startPublishedDate,
       endPublishedDate
@@ -40,7 +48,21 @@ export async function searchExa(
     throw new Error(data?.error || `Search failed: ${resp.status} ${resp.statusText}`);
   }
   const data = await resp.json();
-  return Array.isArray(data?.results) ? data.results : [];
+  return {
+    results: Array.isArray(data?.results) ? data.results : [],
+    warning: data?.warning,
+  };
+}
+
+export interface AnalyzeResult {
+  summary: string;
+  verifierWarnings?: string[];
+  consistencyWarnings?: string[];
+  evaluatorResult?: {
+    citationScore: number;
+    faithfulnessScore: number;
+    issues: Array<{ claim: string; issue: string }>;
+  };
 }
 
 export async function analyzeArticles(
@@ -49,7 +71,7 @@ export async function analyzeArticles(
   articles: ArticleResult[],
   _unusedModel: string,
   domainLeanings?: Record<string, string>
-): Promise<string> {
+): Promise<AnalyzeResult> {
   const resp = await fetch("/api/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -60,5 +82,10 @@ export async function analyzeArticles(
     throw new Error(data?.error || `Analyze failed: ${resp.status} ${resp.statusText}`);
   }
   const data = await resp.json();
-  return data?.summary || "Analysis complete, but no text was generated.";
+  return {
+    summary: data?.summary || "Analysis complete, but no text was generated.",
+    verifierWarnings: data?.verifierWarnings,
+    consistencyWarnings: data?.consistencyWarnings,
+    evaluatorResult: data?.evaluatorResult,
+  };
 }

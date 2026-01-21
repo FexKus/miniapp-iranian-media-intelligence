@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WatchlistItem, Report } from '../types';
-import { Play, Loader2, FileText, ExternalLink, AlertTriangle, CheckCircle2, Ban, Copy, Check } from 'lucide-react';
+import { Play, Loader2, ExternalLink, AlertTriangle, CheckCircle2, Ban, Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface DashboardProps {
@@ -190,6 +190,99 @@ const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, on
                   </div>
                 )}
 
+                {report.searchWarning && (
+                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-md text-amber-800 text-sm mb-6 flex items-start gap-2">
+                    <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-semibold">Search Warning</p>
+                      <p>{report.searchWarning}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Coverage Badge (P0.3) */}
+                {report.coverage && (
+                  <div className="flex items-center gap-2 text-sm mb-4">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      report.coverage.coverageConfidence === 'high' ? 'bg-green-100 text-green-800' :
+                      report.coverage.coverageConfidence === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-orange-100 text-orange-800'
+                    }`}>
+                      {report.coverage.sourceCount} source{report.coverage.sourceCount !== 1 ? 's' : ''} / {
+                        Object.entries(report.coverage.leaningDistribution)
+                          .map(([leaning, count]) => `${count} ${leaning}`)
+                          .join(', ')
+                      }
+                    </span>
+                    {report.coverage.coverageConfidence === 'low' && (
+                      <span className="text-gray-500 text-xs" title="Limited reporting may itself be significant - this topic may be underreported or censored">
+                        ⓘ Thin coverage
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Query Translation Warnings (P1.6) */}
+                {report.queryWarnings && report.queryWarnings.length > 0 && (
+                  <div className="bg-blue-50 border border-blue-200 p-3 rounded-md text-sm mb-4 flex items-start gap-2">
+                    <AlertTriangle size={16} className="mt-0.5 shrink-0 text-blue-600" />
+                    <div>
+                      <p className="font-medium text-blue-800">Query Translation Warning</p>
+                      <ul className="text-blue-700 mt-1 text-xs">
+                        {report.queryWarnings.map((w, i) => <li key={i}>• {w}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                {/* Citation/Verifier Warnings (P1.4) */}
+                {report.verifierWarnings && report.verifierWarnings.length > 0 && (
+                  <div className="bg-amber-50 border border-amber-200 p-3 rounded-md text-sm mb-4 flex items-start gap-2">
+                    <AlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-600" />
+                    <div>
+                      <p className="font-medium text-amber-800">Citation Check</p>
+                      <ul className="text-amber-700 mt-1 text-xs">
+                        {report.verifierWarnings.map((w, i) => <li key={i}>• {w}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                {/* Soft Consistency Warnings (P2.10) */}
+                {report.consistencyWarnings && report.consistencyWarnings.length > 0 && (
+                  <details className="bg-amber-50 border border-amber-200 p-3 rounded-md text-sm mb-4">
+                    <summary className="flex items-center gap-2 cursor-pointer text-amber-800 font-medium">
+                      <AlertTriangle size={16} className="shrink-0 text-amber-600" />
+                      Soft Consistency Warnings
+                    </summary>
+                    <ul className="text-amber-700 mt-2 text-xs ml-6">
+                      {report.consistencyWarnings.map((w, i) => <li key={i}>• {w}</li>)}
+                    </ul>
+                  </details>
+                )}
+
+                {/* Evaluator Scores (P2.11) */}
+                {report.evaluatorResult && (
+                  <div className="bg-purple-50 border border-purple-200 p-3 rounded-md text-sm mb-4">
+                    <p className="font-medium text-purple-800 mb-2">Evaluator Scores</p>
+                    <div className="flex flex-wrap gap-2 text-xs text-purple-700">
+                      <span className="bg-purple-100 px-2 py-1 rounded">
+                        Citation: {report.evaluatorResult.citationScore}
+                      </span>
+                      <span className="bg-purple-100 px-2 py-1 rounded">
+                        Faithfulness: {report.evaluatorResult.faithfulnessScore}
+                      </span>
+                    </div>
+                    {report.evaluatorResult.issues.length > 0 && (
+                      <ul className="text-purple-700 mt-2 text-xs ml-2">
+                        {report.evaluatorResult.issues.map((issue, i) => (
+                          <li key={i}>• {issue.claim}: {issue.issue}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+
                 {report.summary ? (
                   <div className="prose prose-slate prose-headings:font-serif prose-headings:text-gray-900 prose-p:text-gray-700 max-w-none">
                     <ReactMarkdown components={MarkdownComponents}>
@@ -205,30 +298,65 @@ const Dashboard: React.FC<DashboardProps> = ({ watchlist, reports, isRunning, on
                 )}
               </div>
 
-              {/* Sources Footer */}
+              {/* Sources Footer (P1.5: Enhanced Evidence Bundle UX) */}
               {report.articles.length > 0 && (
                 <div className="bg-surface-secondary p-6 border-t border-gray-100">
                   <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Intercepted Media Sources</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {report.articles.map((article, idx) => (
-                      <a 
-                        key={idx} 
-                        href={article.url} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="flex items-start space-x-3 p-3 bg-white border border-gray-200 rounded-md hover:border-accent hover:bg-accent-light/10 transition-all group"
+                      <div
+                        key={idx}
+                        className="p-3 bg-white border border-gray-200 rounded-md hover:border-accent transition-all group"
                       >
-                        <FileText size={16} className="text-gray-400 mt-0.5 group-hover:text-accent shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-gray-900 font-medium truncate group-hover:text-accent transition-colors leading-snug">
-                            {article.title}
-                          </p>
-                          <div className="flex justify-between items-center mt-1">
-                            <span className="text-[11px] text-gray-500">{article.domain}</span>
-                            <span className="text-[10px] text-gray-400">{article.publishedDate ? article.publishedDate.split('T')[0] : ''}</span>
+                        {/* Source number and quality badges */}
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold text-accent">Source {idx + 1}</span>
+                          <div className="flex gap-1">
+                            {article.evidenceQuality === 'short-text' && (
+                              <span className="text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded">
+                                Short text
+                              </span>
+                            )}
+                            {article.evidenceQuality === 'truncated' && (
+                              <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                                No text
+                              </span>
+                            )}
                           </div>
                         </div>
-                      </a>
+                        {/* Article title with link */}
+                        <a
+                          href={article.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block"
+                        >
+                          <p className="text-sm text-gray-900 font-medium truncate group-hover:text-accent transition-colors leading-snug mb-2">
+                            {article.title}
+                          </p>
+                        </a>
+                        {/* Domain, leaning, and date info */}
+                        <div className="flex flex-wrap gap-1.5 text-[11px] mb-2">
+                          <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{article.domain}</span>
+                          {report.domainLeanings?.[article.domain] && (
+                            <span className="bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                              {report.domainLeanings[article.domain]}
+                            </span>
+                          )}
+                          {article.publishedDate && (
+                            <span className="text-gray-400">{article.publishedDate.split('T')[0]}</span>
+                          )}
+                        </div>
+                        {/* External link */}
+                        <a
+                          href={article.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-accent text-xs hover:underline inline-flex items-center gap-1"
+                        >
+                          <ExternalLink size={10} /> View original
+                        </a>
+                      </div>
                     ))}
                   </div>
                 </div>

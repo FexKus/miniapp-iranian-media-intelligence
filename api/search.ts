@@ -1,6 +1,5 @@
-import { INITIAL_SOURCES } from "../constants.js";
 import { ArticleResult } from "../types.js";
-import { normalizeHostname, readJson, requireEnv, safeHostnameFromUrl } from "./_shared.js";
+import { isValidHostname, normalizeHostname, readJson, requireEnv, safeHostnameFromUrl, validateArticle, withRetry } from "./_shared.js";
 
 export const config = {
   runtime: "edge",
@@ -12,6 +11,9 @@ type SearchBody = {
   numResults?: number;
 };
 
+// Maximum domains allowed per search request (Exa API constraint)
+const MAX_DOMAINS = 25;
+
 export default async function handler(req: Request): Promise<Response> {
   try {
     if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
@@ -20,13 +22,25 @@ export default async function handler(req: Request): Promise<Response> {
     const { query, includeDomains, numResults, startPublishedDate, endPublishedDate } = await readJson<SearchBody & { startPublishedDate?: string; endPublishedDate?: string }>(req);
     if (!query?.trim()) return new Response("Missing query", { status: 400 });
 
-    const allowed = new Set(INITIAL_SOURCES.map((s) => normalizeHostname(s.domain)));
     const requested = Array.isArray(includeDomains) ? includeDomains : [];
-    const gatedDomains = Array.from(
-      new Set(requested.map(normalizeHostname).filter((d) => allowed.has(d)))
-    );
+    const normalizedDomains = requested
+      .map((domain) => normalizeHostname(domain))
+      .filter((domain) => isValidHostname(domain));
+    const uniqueDomains = Array.from(new Set(normalizedDomains));
+    const gatedDomains = uniqueDomains.slice(0, MAX_DOMAINS);
+
+    // Log and track if domains were truncated
+    let warning: string | undefined;
+    if (uniqueDomains.length > MAX_DOMAINS) {
+      console.log(`[Search] Domain limit reached: ${uniqueDomains.length} requested, truncated to ${MAX_DOMAINS}`);
+      warning = `Domain limit reached: only the first ${MAX_DOMAINS} of ${uniqueDomains.length} sources will be searched.`;
+    }
+
     if (gatedDomains.length === 0) {
-      return Response.json({ results: [] satisfies ArticleResult[] });
+      return Response.json({
+        results: [] satisfies ArticleResult[],
+        warning: "No valid domains provided. Check your media source list.",
+      });
     }
 
     const body = {
@@ -38,24 +52,23 @@ export default async function handler(req: Request): Promise<Response> {
       endPublishedDate,
     };
 
-    const resp = await fetch("https://api.exa.ai/search", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!resp.ok) {
-      const text = await resp.text().catch(() => "");
+    let data: any;
+    try {
+      data = await withRetry<any>(() => fetch("https://api.exa.ai/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+        },
+        body: JSON.stringify(body),
+      }));
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Unknown error";
       return Response.json(
-        { error: `Exa error: ${resp.status} ${resp.statusText}${text ? ` — ${text.slice(0, 200)}` : ""}` },
+        { error: `Exa error: ${msg}` },
         { status: 502 }
       );
     }
-
-    const data = (await resp.json().catch(() => null)) as any;
     const rawResults: any[] = Array.isArray(data?.results) ? data.results : [];
 
     const mapped: ArticleResult[] = rawResults.map((r) => ({
@@ -69,23 +82,37 @@ export default async function handler(req: Request): Promise<Response> {
       domain: r.url ? normalizeHostname(new URL(r.url).hostname) : "unknown",
     }));
 
-    // Extra hard gate: keep only URLs whose hostname is in our allowed set + selected set.
+    const selectedDomains = new Set(gatedDomains);
+
+    // Extra hard gate: keep only URLs whose hostname is in selected domains.
     const gated = mapped.filter((r) => {
       const host = safeHostnameFromUrl(r.url);
       if (!host) return false;
-      return allowed.has(host) && gatedDomains.includes(host);
+      return selectedDomains.has(host);
     });
+
+    // P1.7: Validate articles and tag with evidence quality
+    const validated: ArticleResult[] = gated
+      .map((article) => {
+        const validation = validateArticle(article);
+        if (!validation.valid) {
+          console.log(`[Search] Filtered article: ${validation.reason} - ${article.url}`);
+          return null;
+        }
+        return { ...article, evidenceQuality: validation.evidenceQuality } as ArticleResult;
+      })
+      .filter((a): a is ArticleResult => a !== null);
 
     // Dedupe by URL
     const seen = new Set<string>();
-    const deduped = gated.filter((r) => {
+    const deduped = validated.filter((r) => {
       const key = r.url?.trim();
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
     });
 
-    return Response.json({ results: deduped });
+    return Response.json({ results: deduped, warning });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
     return Response.json({ error: msg }, { status: 500 });

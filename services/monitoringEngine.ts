@@ -1,5 +1,48 @@
-import { ArticleResult, Report, WatchlistItem } from "../types";
+import { ArticleResult, CoverageMetadata, Report, WatchlistItem } from "../types";
 import { analyzeArticles, searchExa, translateQuery } from "./apiService";
+
+// Compute coverage metadata for thin coverage signaling (P0.3)
+function computeCoverageMetadata(
+  articles: ArticleResult[],
+  domainLeanings: Record<string, string>
+): CoverageMetadata {
+  const uniqueDomains = [...new Set(articles.map(a => a.domain))];
+  const leaningDistribution: Record<string, number> = {};
+
+  for (const article of articles) {
+    const leaning = domainLeanings[article.domain] || 'Unknown';
+    leaningDistribution[leaning] = (leaningDistribution[leaning] || 0) + 1;
+  }
+
+  const dates = articles
+    .map(a => a.publishedDate)
+    .filter((d): d is string => Boolean(d))
+    .sort();
+
+  const dateRange = dates.length > 0
+    ? { earliest: dates[0], latest: dates[dates.length - 1] }
+    : null;
+
+  // Confidence based on source diversity
+  let coverageConfidence: 'high' | 'medium' | 'low';
+  const leaningCount = Object.keys(leaningDistribution).length;
+
+  if (articles.length >= 5 && uniqueDomains.length >= 3 && leaningCount >= 2) {
+    coverageConfidence = 'high';
+  } else if (articles.length >= 2 || uniqueDomains.length >= 2) {
+    coverageConfidence = 'medium';
+  } else {
+    coverageConfidence = 'low';
+  }
+
+  return {
+    sourceCount: articles.length,
+    uniqueDomains,
+    leaningDistribution,
+    dateRange,
+    coverageConfidence,
+  };
+}
 
 export interface RunMonitoringParams {
   exaApiKey: string; // unused (kept for backward compatibility)
@@ -48,15 +91,18 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
     try {
       // Use pre-defined Persian query if available, otherwise translate
       let persianQuery: string;
+      let queryWarnings: string[] | undefined;
       if (item.persianQuery) {
         console.log(`[Monitoring] Using pre-defined Persian query for: ${item.topic}`);
         persianQuery = item.persianQuery;
         onReportUpdate(item.id, { persianQuery, stage: "Scanning Media..." });
       } else {
         onReportUpdate(item.id, { stage: "Translating Topic..." });
-        persianQuery = await translateQuery(geminiApiKey, item.topic, geminiTranslationModel);
+        const translateResult = await translateQuery(geminiApiKey, item.topic, geminiTranslationModel);
+        persianQuery = translateResult.query;
+        queryWarnings = translateResult.warnings;
         if (isCancelled()) throw new Error("Cancelled");
-        onReportUpdate(item.id, { persianQuery, stage: "Scanning Media..." });
+        onReportUpdate(item.id, { persianQuery, queryWarnings, stage: "Scanning Media..." });
       }
 
       // Small delay to be nice to APIs
@@ -86,18 +132,30 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
       }
       // endPublishedDate left undefined means "now"
 
-      const articles: ArticleResult[] = await searchExa(
+      const searchResponse = await searchExa(
         exaApiKey,
         persianQuery,
         activeDomains,
-        3, // Limited to 3 articles for reliable Edge function completion within 25s
+        7, // Pro tier: 7 articles with 60s timeout headroom for evaluator agent
         startPublishedDate,
         endPublishedDate
       );
       if (isCancelled()) throw new Error("Cancelled");
-      onReportUpdate(item.id, { articles, stage: "Analyzing Intelligence..." });
 
-      const summary = await analyzeArticles(
+      const { results: articles, warning: searchWarning } = searchResponse;
+
+      // Compute coverage metadata (P0.3)
+      const coverage = computeCoverageMetadata(articles, domainLeanings);
+
+      onReportUpdate(item.id, {
+        articles,
+        searchWarning,
+        coverage,
+        domainLeanings, // Pass for Evidence Bundle UX (P1.5)
+        stage: "Analyzing Intelligence...",
+      });
+
+      const analyzeResult = await analyzeArticles(
         geminiApiKey,
         item.topic,
         articles,
@@ -105,7 +163,14 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
         domainLeanings
       );
       if (isCancelled()) throw new Error("Cancelled");
-      onReportUpdate(item.id, { summary, status: "completed", stage: "Complete" });
+      onReportUpdate(item.id, {
+        summary: analyzeResult.summary,
+        verifierWarnings: analyzeResult.verifierWarnings,
+        consistencyWarnings: analyzeResult.consistencyWarnings,
+        evaluatorResult: analyzeResult.evaluatorResult,
+        status: "completed",
+        stage: "Complete",
+      });
     } catch (error) {
       if (error instanceof Error && error.message === "Cancelled") {
         onReportUpdate(item.id, { status: "cancelled", stage: "Cancelled" });

@@ -17,6 +17,9 @@ export interface WatchlistItem {
   customEndDate?: string;
 }
 
+// Evidence quality for article validation (P1.7)
+export type EvidenceQuality = 'full' | 'short-text' | 'truncated';
+
 export interface ArticleResult {
   title: string;
   url: string;
@@ -24,6 +27,32 @@ export interface ArticleResult {
   author?: string;
   text: string;
   domain: string;
+  evidenceQuality?: EvidenceQuality; // Quality tag for validation
+}
+
+// Coverage metadata for thin coverage signaling (P0.3)
+export interface CoverageMetadata {
+  sourceCount: number;
+  uniqueDomains: string[];
+  leaningDistribution: Record<string, number>;
+  dateRange: { earliest: string; latest: string } | null;
+  coverageConfidence: 'high' | 'medium' | 'low';
+}
+
+export interface SearchResponse {
+  results: ArticleResult[];
+  warning?: string;
+}
+
+export interface EvaluatorIssue {
+  claim: string;
+  issue: string;
+}
+
+export interface EvaluatorResult {
+  citationScore: number; // 0-100
+  faithfulnessScore: number; // 0-100
+  issues: EvaluatorIssue[];
 }
 
 export interface Report {
@@ -37,6 +66,14 @@ export interface Report {
   summary?: string; // Markdown content
   articles: ArticleResult[];
   error?: string;
+  searchWarning?: string; // Warning from search (e.g., invalid domains)
+  // New fields for P0.3, P1.4, P1.5, P1.6
+  coverage?: CoverageMetadata; // Coverage metadata (P0.3)
+  queryWarnings?: string[]; // Translation/query warnings (P1.6)
+  verifierWarnings?: string[]; // Citation check warnings (P1.4)
+  consistencyWarnings?: string[]; // Soft consistency warnings (P2.10)
+  evaluatorResult?: EvaluatorResult; // Evaluator scores/issues (P2.11)
+  domainLeanings?: Record<string, string>; // For evidence bundle display (P1.5)
 }
 
 export interface AppState {
