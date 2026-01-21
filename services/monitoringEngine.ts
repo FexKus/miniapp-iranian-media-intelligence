@@ -136,7 +136,7 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
         exaApiKey,
         persianQuery,
         activeDomains,
-        7, // Pro tier: 7 articles with 60s timeout headroom for evaluator agent
+        5, // Pro tier: 5 articles - reliable with evaluator agent within 60s
         startPublishedDate,
         endPublishedDate
       );
