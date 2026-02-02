@@ -125,6 +125,18 @@ export function computeDateRange(timeRange?: string, customStartDate?: string, c
   return { startPublishedDate, endPublishedDate };
 }
 
+function coerceArticleResult(article: Partial<ArticleResult>): ArticleResult {
+  return {
+    title: article.title || "Untitled",
+    url: article.url || "",
+    publishedDate: article.publishedDate,
+    author: article.author,
+    text: article.text || "",
+    domain: article.domain || "unknown",
+    evidenceQuality: article.evidenceQuality,
+  };
+}
+
 async function searchArticles(query: string, includeDomains: string[], timeRange?: string, customStartDate?: string, customEndDate?: string) {
   const apiKey = requireEnv("EXA_API_KEY");
   const normalizedDomains = includeDomains
@@ -391,7 +403,7 @@ export const analyzeReport = inngest.createFunction(
         });
       }
 
-      const { results: articles, warning: searchWarning } = await step.run("search", () =>
+      const { results: rawArticles, warning: searchWarning } = await step.run("search", () =>
         searchArticles(
           persianQuery || report.topic,
           report.domains || [],
@@ -400,6 +412,7 @@ export const analyzeReport = inngest.createFunction(
           report.customEndDate
         )
       );
+      const articles = rawArticles.map(coerceArticleResult);
 
       const coverage = computeCoverageMetadata(articles, report.domainLeanings || {});
       await reportRef.update({
