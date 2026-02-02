@@ -60,9 +60,15 @@ export interface Report {
   watchlistItemId: string;
   topic: string;
   timestamp: number;
-  status: 'idle' | 'running' | 'completed' | 'failed' | 'cancelled';
+  status: 'idle' | 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
   stage: string; // e.g., "Translating...", "Searching...", "Analyzing..."
   persianQuery?: string;
+  domains?: string[];
+  domainLeanings?: Record<string, string>;
+  timeRange?: 'last24h' | 'last7d' | 'last30d' | 'custom';
+  customStartDate?: string;
+  customEndDate?: string;
+  idempotencyKey?: string;
   summary?: string; // Markdown content
   articles: ArticleResult[];
   error?: string;
@@ -73,7 +79,10 @@ export interface Report {
   verifierWarnings?: string[]; // Citation check warnings (P1.4)
   consistencyWarnings?: string[]; // Soft consistency warnings (P2.10)
   evaluatorResult?: EvaluatorResult; // Evaluator scores/issues (P2.11)
-  domainLeanings?: Record<string, string>; // For evidence bundle display (P1.5)
+  saved?: boolean;
+  createdAt?: number;
+  updatedAt?: number;
+  expiresAt?: number;
 }
 
 export interface AppState {

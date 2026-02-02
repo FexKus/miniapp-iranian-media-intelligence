@@ -1,13 +1,35 @@
-import React, { useRef, useState } from 'react';
-import Sidebar from './components/Sidebar';
+import React, { useEffect, useRef, useState } from 'react';
+import AppSidebar from './components/AppSidebar';
 import Dashboard from './components/Dashboard';
 import Watchlist from './components/Watchlist';
 import Sources from './components/Sources';
+import SavedReports from './components/SavedReports';
+import Settings from './components/Settings';
 import { Report } from './types';
 import { INITIAL_SOURCES, INITIAL_WATCHLIST } from './constants';
-import { runMonitoring } from './services/monitoringEngine';
+import AuthGate from './components/AuthGate';
+import { useAuth } from './hooks/useAuth';
+import {
+  addSource,
+  addWatchlistItem,
+  deleteReport,
+  deleteSource,
+  deleteWatchlistItem,
+  getSources,
+  getWatchlist,
+  subscribeToReports,
+  subscribeToSources,
+  subscribeToWatchlist,
+  toggleReportSaved,
+  updateSource,
+  updateWatchlistItem,
+} from './lib/firestore';
+
+const REPORT_BATCH_LIMIT = 5;
 
 const App: React.FC = () => {
+  const { user, signOutUser } = useAuth();
+
   // --- State Management ---
   const [activeTab, setActiveTab] = useState('dashboard');
   
@@ -18,37 +40,153 @@ const App: React.FC = () => {
   const [watchlist, setWatchlist] = useState(INITIAL_WATCHLIST);
   const [reports, setReports] = useState<Report[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [savedOnly, setSavedOnly] = useState(false);
+  const [dataReady, setDataReady] = useState(false);
   const runTokenRef = useRef(0);
+  const seededRef = useRef(false);
+  const watchlistReadyRef = useRef(false);
+  const sourcesReadyRef = useRef(false);
+  const reportsReadyRef = useRef(false);
+
+  useEffect(() => {
+    if (!user) return;
+    let unwatchWatchlist: (() => void) | null = null;
+    let unwatchSources: (() => void) | null = null;
+    let unwatchReports: (() => void) | null = null;
+
+    setDataReady(false);
+    watchlistReadyRef.current = false;
+    sourcesReadyRef.current = false;
+    reportsReadyRef.current = false;
+
+    const maybeReady = () => {
+      if (watchlistReadyRef.current && sourcesReadyRef.current && reportsReadyRef.current) {
+        setDataReady(true);
+      }
+    };
+
+    const ensureDefaults = async () => {
+      if (seededRef.current) return;
+      const existingWatchlist = await getWatchlist(user.uid);
+      const existingSources = await getSources(user.uid);
+      if (existingWatchlist.length === 0) {
+        await Promise.all(
+          INITIAL_WATCHLIST.map((item) => addWatchlistItem(user.uid, item))
+        );
+      }
+      if (existingSources.length === 0) {
+        await Promise.all(
+          INITIAL_SOURCES.map((source) =>
+            addSource(user.uid, {
+              name: source.name,
+              domain: source.domain,
+              leaning: source.leaning,
+              active: source.active,
+              description: source.description,
+            })
+          )
+        );
+      }
+      seededRef.current = true;
+    };
+
+    ensureDefaults().catch((error) => {
+      console.error("Failed seeding defaults", error);
+    });
+
+    unwatchWatchlist = subscribeToWatchlist(user.uid, (items) => {
+      setWatchlist(items);
+      if (!watchlistReadyRef.current) {
+        watchlistReadyRef.current = true;
+        maybeReady();
+      }
+    });
+    unwatchSources = subscribeToSources(user.uid, (items) => {
+      setSources(items);
+      if (!sourcesReadyRef.current) {
+        sourcesReadyRef.current = true;
+        maybeReady();
+      }
+    });
+    unwatchReports = subscribeToReports(user.uid, (items) => {
+      setReports(items);
+      if (!reportsReadyRef.current) {
+        reportsReadyRef.current = true;
+        maybeReady();
+      }
+    });
+
+    return () => {
+      unwatchWatchlist?.();
+      unwatchSources?.();
+      unwatchReports?.();
+    };
+  }, [user]);
 
   // --- Persistence Effects ---
   // (no localStorage persistence for keys/models)
 
   // --- Handlers ---
 
-  const toggleSource = (id: string) => {
-    setSources(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
-  };
-
-  const upsertReport = (report: Report) => {
-    setReports((prev) => {
-      const next = prev.filter((r) => r.watchlistItemId !== report.watchlistItemId);
-      next.unshift(report);
-      return next;
-    });
-  };
-
-  const updateReport = (watchlistItemId: string, update: Partial<Report>) => {
-    setReports((prev) => {
-      const next = [...prev];
-      const idx = next.findIndex((r) => r.watchlistItemId === watchlistItemId);
-      if (idx !== -1) next[idx] = { ...next[idx], ...update };
-      return next;
-    });
+  const toggleSource = async (id: string) => {
+    if (!user) return;
+    const source = sources.find((s) => s.id === id);
+    if (!source) return;
+    await updateSource(user.uid, id, { active: !source.active });
   };
 
   const handleCancelMonitoring = () => {
     runTokenRef.current += 1; // invalidate current run
     setIsRunning(false);
+  };
+
+  const createReport = async (itemId: string) => {
+    if (!user) return;
+    const item = watchlist.find((w) => w.id === itemId);
+    if (!item) return;
+    const activeSources = sources.filter(s => s.active).map(s => s.domain);
+    const domainLeanings = Object.fromEntries(
+      sources.map((s) => [s.domain.replace(/^www\./, '').toLowerCase(), s.leaning])
+    );
+    if (activeSources.length === 0) {
+      alert("No media sources selected.");
+      return;
+    }
+
+    const nowHour = new Date().toISOString().slice(0, 13);
+    const idempotencyKey = [
+      user.uid,
+      item.id,
+      item.timeRange || "last7d",
+      item.customStartDate || "",
+      item.customEndDate || "",
+      [...activeSources].sort().join(","),
+      nowHour,
+    ].join(":");
+
+    const token = await user.getIdToken();
+    const response = await fetch("/api/reports/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        watchlistItemId: item.id,
+        topic: item.topic,
+        persianQuery: item.persianQuery,
+        domains: activeSources,
+        domainLeanings,
+        timeRange: item.timeRange || "last7d",
+        customStartDate: item.customStartDate,
+        customEndDate: item.customEndDate,
+        idempotencyKey,
+      }),
+    });
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "Unknown error");
+      throw new Error(errorText);
+    }
   };
 
   const handleRunMonitoring = async (items = watchlist) => {
@@ -62,29 +200,16 @@ const App: React.FC = () => {
     const runToken = runTokenRef.current + 1;
     runTokenRef.current = runToken;
 
-    const activeSources = sources.filter(s => s.active).map(s => s.domain);
-    const domainLeanings = Object.fromEntries(
-      sources.map((s) => [s.domain.replace(/^www\./, '').toLowerCase(), s.leaning])
-    );
-    if (activeSources.length === 0) {
-        alert("No media sources selected.");
-        setIsRunning(false);
-        return;
-    }
-
     try {
-      await runMonitoring({
-        exaApiKey: "",
-        geminiApiKey: "",
-        geminiTranslationModel: "",
-        geminiAnalysisModel: "",
-        activeDomains: activeSources,
-        domainLeanings,
-        items,
-        isCancelled: () => runTokenRef.current !== runToken,
-        onReportInit: upsertReport,
-        onReportUpdate: (watchlistItemId, update) => updateReport(watchlistItemId, update),
-      });
+      for (const item of items.slice(0, REPORT_BATCH_LIMIT)) {
+        if (runTokenRef.current !== runToken) break;
+        try {
+          await createReport(item.id);
+        } catch (error: any) {
+          console.error("Failed to create report", error);
+          alert(error?.message || "Failed to create report");
+        }
+      }
     } finally {
       // Only end the spinner if this is still the active run.
       if (runTokenRef.current === runToken) setIsRunning(false);
@@ -94,35 +219,93 @@ const App: React.FC = () => {
   // --- Render ---
 
   return (
-    <div className="flex min-h-screen bg-background text-text-primary font-sans">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      
-      <main className="flex-1 ml-[260px] p-8 md:p-12 overflow-y-auto h-screen">
-        {activeTab === 'dashboard' && (
-          <Dashboard 
-            watchlist={watchlist} 
-            reports={reports} 
-            isRunning={isRunning} 
-            onRunMonitoring={() => handleRunMonitoring(watchlist)}
-            onRunTopic={(watchlistItemId) => {
-              const item = watchlist.find((w) => w.id === watchlistItemId);
-              if (item) handleRunMonitoring([item]);
-            }}
-            onCancelMonitoring={handleCancelMonitoring}
-          />
-        )}
-        {activeTab === 'watchlist' && (
-          <Watchlist watchlist={watchlist} setWatchlist={setWatchlist} />
-        )}
-        {activeTab === 'sources' && (
-          <Sources 
-            sources={sources} 
-            toggleSource={toggleSource} 
-            setSources={setSources}
-          />
-        )}
-      </main>
-    </div>
+    <AuthGate>
+      <div className="flex min-h-screen bg-background text-foreground font-sans">
+        <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} onSignOut={signOutUser} />
+
+        <main className="flex-1 ml-64 p-8 md:p-12 overflow-y-auto h-screen">
+          {activeTab === 'dashboard' && (
+            <Dashboard 
+              watchlist={watchlist} 
+              reports={savedOnly ? reports.filter((r) => r.saved) : reports} 
+              isRunning={isRunning} 
+              isLoading={!dataReady}
+              savedOnly={savedOnly}
+              onToggleSavedOnly={() => setSavedOnly((prev) => !prev)}
+              onRunMonitoring={() => handleRunMonitoring(watchlist)}
+              onRunTopic={(watchlistItemId) => {
+                const item = watchlist.find((w) => w.id === watchlistItemId);
+                if (item) handleRunMonitoring([item]);
+              }}
+              onCancelMonitoring={handleCancelMonitoring}
+              onToggleReportSaved={async (reportId, saved) => {
+                if (!user) return;
+                await toggleReportSaved(user.uid, reportId, saved);
+              }}
+              onDeleteReport={async (reportId) => {
+                if (!user) return;
+                if (!confirm("Delete this report?")) return;
+                await deleteReport(user.uid, reportId);
+              }}
+              onSignOut={() => signOutUser()}
+            />
+          )}
+          {activeTab === 'watchlist' && (
+            <Watchlist
+              watchlist={watchlist}
+              loading={!dataReady}
+              onAdd={async (item) => {
+                if (!user) return;
+                await addWatchlistItem(user.uid, item);
+              }}
+              onUpdate={async (id, updates) => {
+                if (!user) return;
+                await updateWatchlistItem(user.uid, id, updates);
+              }}
+              onDelete={async (id) => {
+                if (!user) return;
+                await deleteWatchlistItem(user.uid, id);
+              }}
+            />
+          )}
+          {activeTab === 'sources' && (
+            <Sources
+              sources={sources}
+              loading={!dataReady}
+              toggleSource={toggleSource}
+              onAdd={async (source) => {
+                if (!user) return;
+                await addSource(user.uid, source);
+              }}
+              onDelete={async (id) => {
+                if (!user) return;
+                await deleteSource(user.uid, id);
+              }}
+            />
+          )}
+          {activeTab === 'saved-reports' && (
+            <SavedReports
+              reports={reports}
+              onToggleReportSaved={async (reportId, saved) => {
+                if (!user) return;
+                await toggleReportSaved(user.uid, reportId, saved);
+              }}
+              onDeleteReport={async (reportId) => {
+                if (!user) return;
+                if (!confirm("Delete this report?")) return;
+                await deleteReport(user.uid, reportId);
+              }}
+            />
+          )}
+          {activeTab === 'settings' && (
+            <Settings
+              userEmail={user?.email || undefined}
+              onSignOut={signOutUser}
+            />
+          )}
+        </main>
+      </div>
+    </AuthGate>
   );
 };
 

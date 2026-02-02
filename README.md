@@ -75,7 +75,7 @@ Exa AI Search (Iranian domains, 7-day window)
     ↓
 Persian Articles (up to 5 per topic)
     ↓
-Gemini 3.0 Flash Analysis (3500 chars/article)
+Gemini 3.0 Flash Analysis (2000 chars/article)
     ↓
 English Intelligence Report (Markdown)
 ```
@@ -219,22 +219,29 @@ Each intelligence report includes:
 
 ## Performance & Optimization
 
-### Quality Settings (Free Tier)
+### Quality Settings (V2 - Vercel Pro)
 
-- **Articles per Topic**: 3 articles (optimized for 25s Edge function limit)
-- **Article Content**: 3,500 characters per article (quality + speed balance)
+- **Articles per Topic**: 5 articles (optimized for 60s timeout)
+- **Article Content**: 2,000 characters per article (reliability optimized)
 - **Search Window**: 7-day default (customizable)
-- **AI Model**: Gemini 3.0 Flash (December 2025 release)
-- **Timeout**: 25 seconds (Edge runtime on free tier)
+- **AI Model**: Gemini 3.0 Flash
+- **Timeout**: 60 seconds (Vercel Pro maxDuration)
+- **Evaluator Agent**: Currently disabled (planned for V3 with background processing)
 
 ### Speed Expectations
 
 - Translation: ~2-3 seconds
 - Search: ~3-5 seconds
-- Analysis (3 articles): ~12-18 seconds
-- **Total per topic**: ~18-25 seconds
+- Analysis (5 articles): ~20-30 seconds
+- **Total per topic**: ~25-40 seconds
 
-**Note**: For analyzing 5-10 articles per topic, upgrade to Vercel Pro (see "Upgrading to Vercel Pro" section below).
+### V2 Quality Features
+
+- **Coverage Metadata**: Source count, leaning distribution, confidence indicators
+- **Citation Enforcement**: All claims must cite sources (Source 1, Source 2...)
+- **Evidence Quality Tags**: Articles tagged as full/short-text/truncated
+- **Query Validation**: Persian script detection, auto-retry on failures
+- **Consistency Warnings**: Flags potential ungrounded claims
 
 ## Supported Media Sources
 
@@ -269,14 +276,22 @@ Each intelligence report includes:
 │   ├── analyze.ts          # Gemini analysis engine
 │   ├── health.ts           # System health check
 │   └── _shared.ts          # Shared utilities
+├── inngest/                # Background jobs (V3)
+│   ├── client.ts           # Inngest client
+│   └── functions/          # Inngest functions
+├── lib/                    # Firebase helpers
+│   ├── firebase.ts         # Client SDK init
+│   ├── firebaseAdmin.ts    # Admin SDK init
+│   └── firestore.ts        # Firestore CRUD
+├── legacy/                 # Archived V2 client pipeline
+│   └── services/           # Legacy services
 ├── components/             # React components
 │   ├── Dashboard.tsx       # Main intelligence dashboard
 │   ├── Watchlist.tsx       # Topic management
 │   ├── Sources.tsx         # Media source configuration
 │   └── Sidebar.tsx         # Navigation
-├── services/               # Business logic
-│   ├── monitoringEngine.ts # Orchestrates workflow
-│   └── apiService.ts       # API client
+├── contexts/               # Auth context
+├── hooks/                  # Auth hooks
 ├── types.ts                # TypeScript interfaces
 ├── constants.ts            # Default data
 └── index.css              # Global styles
@@ -309,10 +324,11 @@ Each intelligence report includes:
 
 ### Analysis Timeout
 
-- Already optimized for Vercel Edge Functions (25-30s limit)
+- V2 optimized for Vercel Pro with 60s timeout
 - Using Gemini 3.0 Flash for maximum speed
-- Analyzing 3,500 chars per article (sweet spot)
-- If still timing out: Contact Vercel support about plan limits
+- Analyzing 2,000 chars per article (reliability optimized)
+- 5 articles per topic with current settings
+- If still timing out: Check Vercel logs for API errors
 
 ### Translation Issues
 
@@ -341,49 +357,60 @@ Each intelligence report includes:
 3. Generate API key
 4. Add to Vercel as `EXA_API_KEY`
 
-## Upgrading to Vercel Pro for Enhanced Performance
+## Version History
 
-### Current Limitations (Free Tier)
+### V2 (January 2026) - Current
 
-On Vercel's free/hobby plan with Edge runtime:
+**Deployed at**: https://iranian-media-intelligence-v2.vercel.app/
 
-- **Timeout**: 25 seconds (hard limit)
-- **Article Limit**: 3 articles per topic (to ensure completion)
-- **Occasional timeouts** on complex analysis
+- ✅ All P0 items: Dynamic sources, secret protection, thin coverage signaling
+- ✅ All P1 items: Citations, evidence bundle UX, query validation, resilience
+- ✅ P2.10: Soft consistency warnings (entity grounding)
+- ⏸️ P2.11: Evaluator agent disabled (moved to V3)
+- 🔧 Optimized for Vercel Pro: 5 articles, 2000 chars, 60s timeout
 
-### Benefits of Upgrading to Vercel Pro ($20/month)
+### V3 (Planned)
 
-With Vercel Pro + Node.js Serverless runtime:
+- Firebase Firestore for persistent storage (data survives page refresh)
+- Inngest for background jobs (15+ min runtime)
+- Re-enable evaluator agent with constraints
+- Scale to 20-40 articles per topic
+- User authentication and multi-tenant support
 
-- **Timeout**: 60 seconds (vs 25s on free)
-- **Article Limit**: Analyze 5-10 articles per topic reliably
-- **More thorough analysis**: Larger article content (up to 5000+ chars)
-- **Better reliability**: No timeout issues even on complex topics
+See [FIREBASE_INTEGRATION_PLAN.md](./FIREBASE_INTEGRATION_PLAN.md) for detailed V3 roadmap.
 
-### Migration Steps (When Ready to Upgrade)
+## Current Architecture (V2)
 
-1. **Upgrade your Vercel plan** to Pro ($20/month)
-2. **Convert API handlers** from Edge to Node.js Serverless runtime:
-   - Change `runtime: "edge"` to `runtime: "nodejs"`
-   - Update handler signature from Web API to Node.js pattern
-   - Requires code changes in `/api` directory
-3. **Increase limits**:
-   - Set `numResults` to 5-10 articles
-   - Increase article content to 5000+ characters
-   - Add `maxDuration: 60` to analyze endpoint
+### Edge Function Constraints
 
-**Note**: This migration requires technical changes to API handlers. Contact support or refer to Vercel's [serverless function documentation](https://vercel.com/docs/functions/serverless-functions) for implementation details.
+V2 runs on Vercel Edge Functions with:
 
-### When to Upgrade
+- **Timeout**: 60 seconds (Vercel Pro)
+- **Article Limit**: 5 articles per topic
+- **Content**: 2,000 chars per article
+- **Evaluator**: Disabled (requires background processing)
 
-Consider upgrading if:
+### V3 Architecture (Planned)
 
-- You need analysis of 5+ articles per topic
-- Complex topics frequently timeout
-- You want maximum analysis depth and quality
-- This tool is mission-critical for your workflow
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Browser    │────►│ Edge Function│────►│   Firebase   │
+│   (React)    │◄────│  (instant)   │     │  Firestore   │
+└──────────────┘     └──────────────┘     └──────────────┘
+                            │                     ▲
+                            ▼                     │
+                     ┌──────────────┐             │
+                     │   Inngest    │─────────────┘
+                     │ (Background) │  Stores results
+                     │  15+ min OK  │
+                     └──────────────┘
+```
 
-For most use cases, the **free tier with 3-article analysis is sufficient** and produces high-quality intelligence reports.
+V3 will enable:
+- Data persistence (watchlists, sources, reports survive page refresh)
+- Background processing (no timeout pressure)
+- Evaluator agent (quality scoring)
+- Scale to 20-40 articles per topic
 
 ## Contributing
 
@@ -406,4 +433,4 @@ Private use only. Not licensed for redistribution.
 
 ---
 
-**Built with Claude Code** • Last updated: December 2025
+**Built with Claude Code** • Last updated: January 2026 • **V2 Live**: https://iranian-media-intelligence-v2.vercel.app/

@@ -9,9 +9,13 @@
 
 ## Executive Summary
 
-This document provides the architectural rationale behind the improvement recommendations for the Iranian Media Intelligence tool. The guiding principle is: **grounding, clear "coverage is thin" signaling, and resilient API handling matter more than adding complex agent layers.**
+This document provides the architectural rationale behind the Iranian Media Intelligence tool.
 
-The recommendations prioritize robustness and usefulness while avoiding unnecessary complexity.
+**Current State (V2):** All P0-P1 items implemented and deployed at https://iranian-media-intelligence-v2.vercel.app/. Grounding enforcement, coverage signaling, and resilience patterns are production-ready. P2.10 (consistency warnings) complete. P2.11 (evaluator agent) deferred to V3 due to Edge timeout constraints.
+
+**V3 Direction:** Firebase + Inngest integration will add persistent storage and background processing, enabling evaluator agent and scaling to 20-40 articles per topic. See [FIREBASE_INTEGRATION_PLAN.md](./FIREBASE_INTEGRATION_PLAN.md).
+
+The guiding principle is: **grounding, clear "coverage is thin" signaling, and resilient API handling matter more than adding complex agent layers.**
 
 ---
 
@@ -141,7 +145,9 @@ Retries should be driven by "this looks broken/irrelevant," not by "this is narr
 - Automated pass flags sentences without citations in Executive Summary and Significance sections
 - **Quote extraction (optional):** For top claims, extract 1-2 short Persian snippets from article text that support them
 
-### 3.5 Consistency Checks (Soft Warnings)
+### 3.5 Consistency Checks (Soft Warnings) ✅ IMPLEMENTED
+
+**Status:** Implemented in V2
 
 **What it is:** A hallucination detector and "analysis hygiene" signal.
 
@@ -150,28 +156,43 @@ Retries should be driven by "this looks broken/irrelevant," not by "this is narr
 - An overconfident inference
 - The model "importing" background knowledge not in the evidence
 
-**Implementation (low complexity):**
+**Implementation:**
 
-If the generated summary contains named entities/key terms that have **zero presence** in the evidence bundle, attach a flag:
-- "⚠️ Possible ungrounded entity/claim: 'Majles' not found in sources."
+- `api/_shared.ts`: `extractCandidateEntitiesFromSummary()` extracts named entities (title-case words, acronyms, Persian text)
+- `api/_shared.ts`: `buildConsistencyWarnings()` checks entities against source text
+- `api/analyze.ts`: Returns `consistencyWarnings` array in response
+- `Dashboard.tsx`: Displays warnings in collapsible amber warning section
 
-**Do NOT block the report** — just surface the warning for analyst review.
+**Example Output:**
+```
+⚠️ Possible ungrounded claim: "Majles" not found in sources
+```
 
-### 3.6 Lightweight Verifier Pass
+Reports are never blocked — warnings are informational for analyst review.
 
-Instead of a complex "Generator-Critic" multi-agent architecture, start with a **lightweight verifier pass** focused purely on:
+### 3.6 Lightweight Verifier Pass ✅ IMPLEMENTED / ⏸️ EVALUATOR DEFERRED
 
-- Citation presence in key sections
-- Entity grounding (consistency check above)
-- Basic sanity checks
+**Citation Verification (V2 - IMPLEMENTED):**
 
-This can be a single additional LLM call that reviews the generated brief against the evidence bundle, outputting **structured issues** that are actionable for an analyst UI, e.g.:
-- `sentence` (the sentence being flagged)
-- `issue` (e.g., `missing_citation`, `contradicts_source`, `ungrounded_entity`)
-- `severity` (`error` or `warning`)
-- optional `details`
+Regex-based citation checking in `api/analyze.ts`:
+- Checks Executive Summary for uncited sentences (sentences > 20 chars without `(Source N)` pattern)
+- Returns `citationCount` and `verifierWarnings` array
+- Warnings displayed in `Dashboard.tsx` amber warning section
 
-Defer the full "Evaluator-Optimizer workflow" until you've validated this simpler approach works.
+**Evaluator Agent (V3 - DEFERRED):**
+
+Due to Edge Function timeout constraints (60s max), the full evaluator agent is deferred to V3 where background processing via Inngest allows 15+ minute runtime.
+
+**V3 Evaluator Constraints:**
+
+| Constraint | Value | Rationale |
+|------------|-------|-----------|
+| Min sources | 2 | Not enough evidence to evaluate with < 2 |
+| Max articles | 5 | Cap token cost and latency |
+| Timeout | 30s | Fail-open to avoid blocking completion |
+| Skip truncated majority | Yes | Can't verify claims against missing text |
+
+See [FIREBASE_INTEGRATION_PLAN.md](./FIREBASE_INTEGRATION_PLAN.md) Phase 5 for V3 implementation details.
 
 ### 3.7 Human-in-the-Loop Triggers
 
@@ -254,7 +275,9 @@ Model "agents" as stateless runs/jobs:
 ### 5.5 Deep Dive Telemetry (Quality, not cost)
 
 Deep Dive is opt-in and should be measured by whether it improves **quality outcomes**, e.g.:
-- Did Deep Dive materially increase relevant source count?\n+- Did it increase full-text retrieval success rate?\n+- Did it reduce missing-citation or ungrounded-entity warnings?
+- Did Deep Dive materially increase relevant source count?
+- Did it increase full-text retrieval success rate?
+- Did it reduce missing-citation or ungrounded-entity warnings?
 
 ### 5.4 Context-Independent Generalization (Future)
 
@@ -264,14 +287,45 @@ Deep Dive is opt-in and should be measured by whether it improves **quality outc
 
 ---
 
-## 6. Priority Summary
+## 6. Version Status & Priority Summary
 
-| Priority | Focus Area | Key Items |
-|----------|------------|-----------|
-| **P0** | Correctness + Risk | Dynamic sources, secret protection, thin coverage as valid outcome |
-| **P1** | Reliability + Quality | Grounding/citations, query checks, hard gates, resilience patterns |
-| **P2** | Capability Upgrades | Deep Dive mode, soft consistency warnings, narrow evaluator agent |
-| **P3** | Productization | Multi-tenant architecture, scheduling/alerts |
+### V2 Completion Status (Current)
+
+**Deployed:** https://iranian-media-intelligence-v2.vercel.app/
+
+| Priority | Focus Area | Status |
+|----------|------------|--------|
+| **P0** | Correctness + Risk | ✅ Complete |
+| **P1** | Reliability + Quality | ✅ Complete |
+| **P2.10** | Soft Consistency Warnings | ✅ Complete |
+| **P2.11** | Evaluator Agent | ⏸️ Deferred to V3 |
+| **P2.9** | Deep Dive Mode | ⏸️ Future |
+| **P3** | Productization | ⏸️ Future |
+
+### V3 Architecture Preview
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Browser    │────►│ Edge Function│────►│   Firebase   │
+│   (React)    │◄────│  (instant)   │     │  Firestore   │
+└──────────────┘     └──────────────┘     └──────────────┘
+                            │                     ▲
+                            ▼                     │
+                     ┌──────────────┐             │
+                     │   Inngest    │─────────────┘
+                     │ (Background) │  Stores results
+                     │  15+ min OK  │
+                     └──────────────┘
+```
+
+**V3 Benefits:**
+- Data persistence (watchlists, sources, reports survive page refresh)
+- Background jobs (15+ min runtime, no Edge timeout pressure)
+- Re-enable evaluator agent with proper constraints
+- Scale to 20-40 articles per topic
+- Multi-user support with Firebase Auth
+
+**Full V3 Plan:** [FIREBASE_INTEGRATION_PLAN.md](./FIREBASE_INTEGRATION_PLAN.md)
 
 ### Deferred / Dropped (to avoid complexity)
 
@@ -294,18 +348,30 @@ These are valuable, but together they constitute a scoped **Query Optimization L
 
 ## 7. Conclusion
 
-The current architecture is solid. The most impactful improvements prioritize **grounding, clear signaling, and resilience** over complex agent orchestration:
+V2 delivers a production-grade intelligence monitoring platform with **grounding, clear signaling, and resilience** as the core pillars:
 
-1. **Add grounding checks** — citations required, quote extraction optional
-2. **Add retry/backoff logic** — for API resilience with clear failure states
-3. **Implement coverage metadata** — measure and display, don't enforce minimums
-4. **Add translation/query sanity checks** — script detection, length guards
-5. **Implement lightweight verifier pass** — focused on citations and entity grounding
-6. **Add Deep Dive toggle** — user-invoked, not automatic fallback for thin coverage
-7. **Conservative auto-repair only** — for clear pipeline failures, not narrow coverage
+### V2 Implemented Features
 
-The north star is: **robust, usable, reliable; avoid over-complexity.** These changes will transform the tool from a functional prototype into a production-grade intelligence platform without creating an over-engineered system that's hard to debug and maintain.
+1. ✅ **Grounding checks** — citations required, uncited sentences flagged
+2. ✅ **Retry/backoff logic** — API resilience with exponential backoff
+3. ✅ **Coverage metadata** — measure and display, thin coverage as valid signal
+4. ✅ **Translation/query sanity checks** — Persian script detection, length guards, auto-retry
+5. ✅ **Lightweight verifier pass** — citation counting, consistency warnings
+6. ✅ **Evidence quality tags** — articles tagged as full/short-text/truncated
+7. ✅ **Conservative auto-repair** — query regeneration for pipeline failures only
+
+### V3 Roadmap
+
+V3 will add persistent storage and background processing via Firebase + Inngest:
+- Re-enable evaluator agent with proper timeout constraints
+- Scale to 20-40 articles per topic
+- Multi-user support with authentication
+- Data persistence across page refreshes
+
+The north star remains: **robust, usable, reliable; avoid over-complexity.**
 
 ---
 
+**V2 Deployed:** https://iranian-media-intelligence-v2.vercel.app/
+**V3 Plan:** [FIREBASE_INTEGRATION_PLAN.md](./FIREBASE_INTEGRATION_PLAN.md)
 *For implementation tasks and acceptance criteria, see [DEVELOPER_PLAN.md](./DEVELOPER_PLAN.md)*

@@ -1,7 +1,10 @@
 # Developer Plan: Iranian Media Intelligence Improvements
 
 **Actionable implementation roadmap for developers**
-*January 2026 | Version 1.0*
+*January 2026 | Version 2.0*
+
+> **V2 Complete**: All P0-P1 items implemented and deployed at https://iranian-media-intelligence-v2.vercel.app/
+> **V3 Planned**: Firebase + Inngest integration (see [FIREBASE_INTEGRATION_PLAN.md](./FIREBASE_INTEGRATION_PLAN.md))
 
 > **Reference:** For detailed rationale, trade-off analysis, and architectural context, see [ARCHITECTURE_REFERENCE.md](./ARCHITECTURE_REFERENCE.md)
 
@@ -234,31 +237,57 @@
 
 ---
 
-### 10. Soft Consistency Warnings
+### 10. Soft Consistency Warnings ✅
 **Goal:** Flag likely hallucinations without blocking reports.
 
-**Tasks:**
-- [ ] Extract named entities from generated summary
-- [ ] Check if each entity appears in at least one source text
-- [ ] If entity has zero presence in sources, add warning:
+**Status:** IMPLEMENTED in V2
+
+**Implementation:**
+- [x] Extract named entities from generated summary
+  - *Implemented in `api/_shared.ts`: `extractCandidateEntitiesFromSummary()` function*
+  - *Extracts title-case words, acronyms, and Persian text as candidate entities*
+- [x] Check if each entity appears in at least one source text
+  - *Implemented in `api/_shared.ts`: `buildConsistencyWarnings()` function*
+  - *Normalizes text and checks for entity presence*
+- [x] If entity has zero presence in sources, add warning:
   ```
   ⚠️ Possible ungrounded claim: "Majles" not found in sources
   ```
-- [ ] Display warnings in report UI (collapsible section)
-- [ ] Never block report generation based on these warnings
+  - *Warnings returned as `consistencyWarnings` array from `api/analyze.ts`*
+- [x] Display warnings in report UI (collapsible section)
+  - *Implemented in `Dashboard.tsx`: Consistency warnings displayed in amber warning box*
+- [x] Never block report generation based on these warnings
+  - *Warnings are purely informational; reports always generate*
 
 **Acceptance Criteria:**
-- Ungrounded entity → warning displayed
-- Report still generates and displays
+- ✅ Ungrounded entity → warning displayed
+- ✅ Report still generates and displays
 
 ---
 
-### 11. Evaluator Agent (Narrow Scope)
+### 11. Evaluator Agent (Narrow Scope) ⏸️ DEFERRED TO V3
 **Goal:** Automated quality check for faithfulness + citation coverage.
 
-**Prerequisite:** Only implement after P1 verifier pass is validated.
+**Status:** DEFERRED - Requires background processing to avoid Edge Function timeout
 
-**Tasks:**
+**V2 State:**
+- Code written and tested but **disabled** in production for reliability
+- Edge Function 60s timeout not sufficient for analysis + evaluator + error handling
+- Comment in `api/analyze.ts`: "P2.11: Evaluator agent - DISABLED for Edge Function reliability"
+
+**V3 Implementation Plan (see [FIREBASE_INTEGRATION_PLAN.md](./FIREBASE_INTEGRATION_PLAN.md) Phase 5):**
+
+- Inngest background function with 15+ minute runtime
+- Evaluator constraints to ensure reliability:
+
+| Constraint | Value | Rationale |
+|------------|-------|-----------|
+| Min sources | 2 | Not enough evidence to evaluate with < 2 |
+| Max articles | 5 | Cap token cost and latency |
+| Timeout | 30s | Fail-open to avoid blocking completion |
+| Skip truncated | Yes | Can't verify claims against missing text |
+
+**Tasks (V3):**
 - [ ] Single LLM call that reviews report against evidence bundle
 - [ ] Check only:
   - Citation coverage (are key claims cited?)
@@ -273,10 +302,10 @@
   ```
 - [ ] Display scores in report metadata
 
-**Acceptance Criteria:**
-- Evaluator runs in < 5 seconds
-- Scores correlate with actual quality issues
-- Does not block report generation
+**Acceptance Criteria (V3):**
+- [ ] Evaluator runs in background (no Edge timeout pressure)
+- [ ] Scores correlate with actual quality issues
+- [ ] Does not block report generation (fail-open)
 
 ---
 
@@ -286,8 +315,8 @@
 **Goal:** Shared backend with strict user isolation.
 
 **Tasks:**
-- [ ] Integrate auth provider (Clerk, Auth0, or Supabase Auth)
-- [ ] Add database for user data (Supabase or PlanetScale)
+- [ ] Integrate auth provider (Firebase Auth)
+- [ ] Add database for user data (Firestore)
 - [ ] Scope all queries by `user_id` or `org_id`
 - [ ] Implement per-tenant rate limits and quotas
 - [ ] Create configuration templates per region (Iran, Syria, Yemen)
@@ -315,6 +344,72 @@
 **Acceptance Criteria:**
 - Scheduled scan runs reliably
 - High-significance event → notification delivered
+
+---
+
+## P4: Database Integration (Version 3)
+
+> **Full implementation plan:** [FIREBASE_INTEGRATION_PLAN.md](./FIREBASE_INTEGRATION_PLAN.md)
+
+### 14. Firebase + Inngest Integration
+**Goal:** Persistent storage + background processing
+
+**Benefits:**
+- Data survives page refresh (watchlists, sources, reports)
+- 15+ minute background job runtime (no Edge timeout pressure)
+- Scale to 20-40 articles per topic
+- Re-enable evaluator agent with proper constraints
+- Multi-user support with data isolation
+
+**Architecture:**
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Browser    │────►│ Edge Function│────►│   Firebase   │
+│   (React)    │◄────│  (instant)   │     │  Firestore   │
+└──────────────┘     └──────────────┘     └──────────────┘
+                            │                     ▲
+                            ▼                     │
+                     ┌──────────────┐             │
+                     │   Inngest    │─────────────┘
+                     │ (Background) │  Stores results
+                     │  15+ min OK  │
+                     └──────────────┘
+```
+
+**Key Components:**
+- Firebase Firestore for user data, watchlists, reports
+- Firebase Auth (Google Sign-in + Email/Password)
+- Inngest for background analysis jobs
+- TTL-based auto-delete for unsaved reports (7 days)
+- Field-level security rules for data protection
+
+**Estimated Effort:** 2-3 days focused development
+
+**Tasks:**
+- [ ] Phase 1: Firebase project setup and SDK initialization
+- [ ] Phase 2: Authentication (Google Sign-in + Email/Password)
+- [ ] Phase 3: Data migration (watchlist, sources to Firestore)
+- [ ] Phase 4: Inngest setup for background jobs
+- [ ] Phase 5: Background analysis with evaluator agent
+- [ ] Phase 6: Report persistence with save/delete
+- [ ] Phase 7: Frontend updates for real-time sync
+- [ ] Phase 8: Cleanup and polish
+
+---
+
+### 15. Multi-User Support
+**Goal:** User authentication and data isolation
+
+**Included in V3 Firebase integration:**
+- Firebase Auth for login (Google + Email/Password)
+- User-scoped Firestore collections (`users/{userId}/...`)
+- Security rules preventing cross-user data access
+- TTL-based cleanup for unsaved reports
+
+**Acceptance Criteria:**
+- [ ] User A cannot see User B's data
+- [ ] Reports auto-delete after 7 days unless saved
+- [ ] Real-time sync across browser tabs
 
 ---
 
@@ -360,12 +455,16 @@ The following were considered but deferred to avoid premature complexity. Revisi
 ## Implementation Order
 
 ```
-Phase 1 (Week 1-2): P0 items — correctness and security
-Phase 2 (Week 3-4): P1 items — reliability and quality
-Phase 3 (Week 5):   P2 reliability improvements + end-to-end test
-Phase 4 (Week 6):   P2 Deep Dive mode (opt-in)
-Phase 5 (Future):   P3 items — productization
+Phase 1 (Complete): P0 items — correctness and security ✅
+Phase 2 (Complete): P1 items — reliability and quality ✅
+Phase 3 (Complete): P2.10 soft consistency warnings ✅
+Phase 4 (V2):       P2.11 evaluator agent ⏸️ (deferred to V3)
+Phase 5 (V3):       P4 Firebase + Inngest integration
+Phase 6 (Future):   P2.9 Deep Dive mode + P3 productization items
 ```
+
+**Current Version:** V2 deployed at https://iranian-media-intelligence-v2.vercel.app/
+**Next Version:** V3 with Firebase integration (see [FIREBASE_INTEGRATION_PLAN.md](./FIREBASE_INTEGRATION_PLAN.md))
 
 ---
 

@@ -1,6 +1,6 @@
-import { ArticleResult, SearchResponse } from "../types";
+import { ArticleResult, SearchResponse } from "../../types";
 
-// Client calls same-origin serverless endpoints on Vercel.
+// Legacy V2 client: retained for reference.
 
 export interface TranslateResult {
   query: string;

@@ -1,7 +1,8 @@
-import { ArticleResult, CoverageMetadata, Report, WatchlistItem } from "../types";
+import { ArticleResult, CoverageMetadata, Report, WatchlistItem } from "../../types";
 import { analyzeArticles, searchExa, translateQuery } from "./apiService";
 
-// Compute coverage metadata for thin coverage signaling (P0.3)
+// Legacy V2 client orchestration: retained for reference.
+
 function computeCoverageMetadata(
   articles: ArticleResult[],
   domainLeanings: Record<string, string>
@@ -23,7 +24,6 @@ function computeCoverageMetadata(
     ? { earliest: dates[0], latest: dates[dates.length - 1] }
     : null;
 
-  // Confidence based on source diversity
   let coverageConfidence: 'high' | 'medium' | 'low';
   const leaningCount = Object.keys(leaningDistribution).length;
 
@@ -45,10 +45,10 @@ function computeCoverageMetadata(
 }
 
 export interface RunMonitoringParams {
-  exaApiKey: string; // unused (kept for backward compatibility)
-  geminiApiKey: string; // unused (kept for backward compatibility)
-  geminiTranslationModel: string; // unused (kept for backward compatibility)
-  geminiAnalysisModel: string; // unused (kept for backward compatibility)
+  exaApiKey: string;
+  geminiApiKey: string;
+  geminiTranslationModel: string;
+  geminiAnalysisModel: string;
   activeDomains: string[];
   domainLeanings: Record<string, string>;
   items: WatchlistItem[];
@@ -89,11 +89,9 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
     onReportInit(report);
 
     try {
-      // Use pre-defined Persian query if available, otherwise translate
       let persianQuery: string;
       let queryWarnings: string[] | undefined;
       if (item.persianQuery) {
-        console.log(`[Monitoring] Using pre-defined Persian query for: ${item.topic}`);
         persianQuery = item.persianQuery;
         onReportUpdate(item.id, { persianQuery, stage: "Scanning Media..." });
       } else {
@@ -105,11 +103,9 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
         onReportUpdate(item.id, { persianQuery, queryWarnings, stage: "Scanning Media..." });
       }
 
-      // Small delay to be nice to APIs
       await new Promise((resolve) => setTimeout(resolve, 500));
       if (isCancelled()) throw new Error("Cancelled");
 
-      // Calculate dates based on time range
       let startPublishedDate: string | undefined;
       let endPublishedDate: string | undefined;
 
@@ -125,33 +121,29 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         startPublishedDate = thirtyDaysAgo.toISOString();
       } else {
-        // Default to last 7 days (includes last7d and undefined)
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         startPublishedDate = sevenDaysAgo.toISOString();
       }
-      // endPublishedDate left undefined means "now"
 
       const searchResponse = await searchExa(
         exaApiKey,
         persianQuery,
         activeDomains,
-        5, // Pro tier: 5 articles - reliable with evaluator agent within 60s
+        5,
         startPublishedDate,
         endPublishedDate
       );
       if (isCancelled()) throw new Error("Cancelled");
 
       const { results: articles, warning: searchWarning } = searchResponse;
-
-      // Compute coverage metadata (P0.3)
       const coverage = computeCoverageMetadata(articles, domainLeanings);
 
       onReportUpdate(item.id, {
         articles,
         searchWarning,
         coverage,
-        domainLeanings, // Pass for Evidence Bundle UX (P1.5)
+        domainLeanings,
         stage: "Analyzing Intelligence...",
       });
 
@@ -185,5 +177,3 @@ export async function runMonitoring(params: RunMonitoringParams): Promise<void> 
     }
   }
 }
-
-
