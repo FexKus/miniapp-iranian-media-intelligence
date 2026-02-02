@@ -74,7 +74,7 @@ This tool enables analysts to monitor Iranian media narratives by:
 | **AI Translation** | Google Gemini 3.0 Flash | English → Persian |
 | **AI Analysis** | Google Gemini 3.0 Flash | Article analysis |
 | **Search** | Exa AI | Iranian domain search |
-| **Hosting** | Vercel | Edge Functions + Static |
+| **Hosting** | Vercel | Node.js Functions + Static |
 
 ### System Architecture
 
@@ -105,7 +105,7 @@ This tool enables analysts to monitor Iranian media narratives by:
                               │ HTTPS
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      VERCEL EDGE                                 │
+│                   VERCEL NODE.JS FUNCTIONS                       │
 │  ┌──────────────────┐  ┌──────────────┐  ┌──────────────┐      │
 │  │/api/reports/create│  │ /api/search  │  │ /api/inngest │      │
 │  │ (triggers Inngest)│  │  (Exa AI)    │  │  (webhook)   │      │
@@ -198,7 +198,18 @@ users/{userId}/
 
 ## Environment Variables
 
-### Required (Server-side)
+### ⚠️ CRITICAL: Two Sets of Firebase Variables Required
+
+Firebase needs **both** client-side AND server-side variables. This is a common deployment pitfall:
+
+| Prefix | When Injected | Purpose | Symptom if Missing |
+|--------|---------------|---------|-------------------|
+| `VITE_*` | Build time | Browser SDK | Sources show "0/0 Active", Firestore errors |
+| No prefix | Runtime | API routes | "Missing FIREBASE_PROJECT_ID" error |
+
+**Important:** After changing `VITE_*` variables in Vercel, you must redeploy **with cache cleared**!
+
+### Server-side (no prefix - runtime)
 
 | Variable | Description | Get from |
 |----------|-------------|----------|
@@ -210,13 +221,13 @@ users/{userId}/
 | `FIREBASE_CLIENT_EMAIL` | Service account email | Firebase Console → Service Accounts |
 | `FIREBASE_PRIVATE_KEY` | Service account private key (with `\n` newlines) | Firebase Console → Service Accounts |
 
-### Frontend (Public - VITE_ prefix)
+### Client-side (VITE_ prefix - build time)
 
 | Variable | Description |
 |----------|-------------|
 | `VITE_FIREBASE_API_KEY` | Firebase Web API key |
 | `VITE_FIREBASE_AUTH_DOMAIN` | Firebase Auth domain |
-| `VITE_FIREBASE_PROJECT_ID` | Firebase project ID |
+| `VITE_FIREBASE_PROJECT_ID` | Firebase project ID (**same value** as FIREBASE_PROJECT_ID) |
 | `VITE_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging ID |
 | `VITE_FIREBASE_APP_ID` | Firebase app ID |
@@ -419,6 +430,18 @@ Each intelligence report includes:
 
 ## Troubleshooting
 
+### Sources Show "0 / 0 Active" or Disappear
+
+**Most common issue!** Check browser DevTools → Network → look for Firestore requests:
+- If URL contains `projects/undefined/databases` → Missing `VITE_FIREBASE_PROJECT_ID`
+- Fix: Add the variable in Vercel with `VITE_` prefix, then redeploy **with cache cleared**
+
+### "Missing FIREBASE_PROJECT_ID" Error on Run Monitoring
+
+- Server-side variable missing (no VITE_ prefix)
+- Fix: Add `FIREBASE_PROJECT_ID` to Vercel environment variables
+- Normal redeploy is sufficient (server vars are runtime)
+
 ### Google Sign-in Not Working
 
 - Use `http://localhost:5173/` not `http://127.0.0.1:5173/`
@@ -427,14 +450,15 @@ Each intelligence report includes:
 
 ### Source Toggle Not Working
 
-- Verify Firestore security rules allow authenticated writes
+- Most likely: Missing `VITE_FIREBASE_PROJECT_ID` (see above)
+- Also check: Firestore security rules allow authenticated writes
 - Check browser DevTools Network tab for failed requests
-- Ensure user is properly authenticated
 
-### Analysis Not Completing
+### Analysis Not Completing / Reports Stuck on "Pending"
 
-- Check Inngest dashboard for job status
+- Check Inngest dashboard for job status and errors
 - Verify `INNGEST_EVENT_KEY` and `INNGEST_SIGNING_KEY` are set
+- Ensure Inngest app is synced with your Vercel URL
 - Check Vercel function logs for errors
 - Verify `FIREBASE_PRIVATE_KEY` includes proper newlines
 
@@ -463,7 +487,14 @@ Features designed but not yet implemented:
 
 ## Version History
 
-### V3 (February 2026) - Current
+### V3.1 (February 3, 2026) - Current
+
+- **Fixed:** API routes converted to `VercelRequest`/`VercelResponse` pattern
+- **Fixed:** Inngest import changed to `inngest/next` for Node.js runtime
+- **Fixed:** Environment variable documentation clarified (VITE_ vs non-VITE)
+- All functionality verified working in production
+
+### V3 (February 2026)
 
 - Firebase Authentication (Google + Email/Password)
 - Cloud Firestore for persistent user data
@@ -505,4 +536,4 @@ Private use only. Not licensed for redistribution.
 
 ---
 
-**Built with Claude Code** • Last updated: February 2026 • **V3**
+**Built with Claude Code** • Last updated: February 3, 2026 • **V3.1**

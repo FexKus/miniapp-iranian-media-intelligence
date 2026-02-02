@@ -30,11 +30,13 @@ The Iranian Media Intelligence Platform is a professional monitoring tool that t
 ### Backend
 | Technology | Purpose |
 |------------|---------|
-| Vercel Edge Functions | API routes (instant responses) |
+| Vercel Node.js Functions | API routes (`runtime: "nodejs"`) |
 | Inngest | Background job processing (15+ min runtime) |
 | Firebase Auth | User authentication (Google + Email/Password) |
 | Cloud Firestore | NoSQL database for persistent storage |
 | Firebase Admin SDK | Server-side Firestore access |
+
+**Important:** API routes use `VercelRequest`/`VercelResponse` (Node.js style), NOT Web API `Request`/`Response`.
 
 ### External APIs
 | Service | Purpose |
@@ -225,24 +227,35 @@ MiniApp_iranian-media-intelligence/
 
 ## 6. Environment Variables
 
-### Client-side (Vite - exposed to browser)
+### CRITICAL: Two Sets of Firebase Variables Required
+
+Firebase needs **both** client-side AND server-side variables. Missing either causes different failures:
+
+| Prefix | When Injected | Used By | If Missing |
+|--------|---------------|---------|------------|
+| `VITE_*` | Build time | Browser (Firebase JS SDK) | Firestore shows `projects/undefined/databases` |
+| No prefix | Runtime | API routes (Firebase Admin SDK) | "Missing FIREBASE_PROJECT_ID" error |
+
+**After changing `VITE_*` variables, you MUST redeploy with cache cleared!**
+
+### Client-side (VITE_ prefix - baked into build)
 ```env
 VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_PROJECT_ID=           # MUST have VITE_ prefix!
 VITE_FIREBASE_STORAGE_BUCKET=
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 
-### Server-side (Vercel - never exposed)
+### Server-side (no prefix - runtime only)
 ```env
 # External APIs
 GEMINI_API_KEY=           # Google AI Studio
 EXA_API_KEY=              # Exa.ai
 
 # Firebase Admin SDK (three separate vars, NOT base64 encoded)
-FIREBASE_PROJECT_ID=      # From service account JSON: project_id
+FIREBASE_PROJECT_ID=      # Same value as VITE_FIREBASE_PROJECT_ID
 FIREBASE_CLIENT_EMAIL=    # From service account JSON: client_email
 FIREBASE_PRIVATE_KEY=     # From service account JSON: private_key (include \n chars)
 
@@ -423,10 +436,13 @@ npm run lint
 | Issue | Solution |
 |-------|----------|
 | "Firebase Auth initialization failed" | Check VITE_FIREBASE_* env vars |
-| Toggle not working | Check Firestore security rules |
+| Sources show "0 / 0 Active" | Missing `VITE_FIREBASE_PROJECT_ID` - check for `projects/undefined` in Network tab |
+| "Missing FIREBASE_PROJECT_ID" error | Add `FIREBASE_PROJECT_ID` (no VITE_ prefix) for server-side |
+| Toggle not working | Check Firestore security rules OR missing VITE_FIREBASE_PROJECT_ID |
 | Reports stuck on "pending" | Check Inngest dashboard for errors |
 | No articles found | Expand time range, enable more sources |
 | Timeout errors | Inngest handles long jobs - check logs |
+| `TypeError: request.headers.get is not a function` | API using Web API style but runtime is Node.js - use VercelRequest |
 
 ### Debug Locations
 
@@ -441,7 +457,14 @@ npm run lint
 
 ## 14. Version History
 
-### V3 (February 2026) - Current
+### V3.1 (February 3, 2026) - Current
+
+- **Fixed:** API routes converted to `VercelRequest`/`VercelResponse` (was causing TypeError)
+- **Fixed:** Inngest import changed to `inngest/next` (was causing sync failures)
+- **Fixed:** Environment variable documentation (VITE_ vs non-VITE distinction)
+- All functionality verified working in production
+
+### V3 (February 2026)
 
 - Firebase Auth (Google + Email/Password)
 - Cloud Firestore for persistent storage
@@ -480,6 +503,20 @@ When helping with this codebase:
 ### Key Patterns
 
 ```typescript
+// API Routes - MUST use VercelRequest/VercelResponse with runtime: "nodejs"
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+
+export const config = { runtime: "nodejs" };
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const authHeader = req.headers.authorization;  // NOT .get()
+  const body = req.body;                          // Already parsed
+  return res.status(200).json({ data });          // NOT new Response()
+}
+
+// Inngest - use inngest/next (works with Node.js runtime)
+import { serve } from "inngest/next";  // NOT inngest/edge
+
 // Toast notifications
 import { toast } from 'sonner';
 toast.success('Success message');
@@ -511,4 +548,4 @@ try {
 
 ---
 
-*Last updated: February 2026*
+*Last updated: February 3, 2026*
