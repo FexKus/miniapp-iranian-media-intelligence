@@ -1,10 +1,6 @@
-import { serve } from "inngest/edge";
+import { serve } from "inngest/next";
 import { inngest } from "../inngest/client.js";
 import { analyzeReport } from "../inngest/functions/analyzeReport.js";
-
-export const config = {
-  runtime: "nodejs",
-};
 
 export default serve({
   client: inngest,
