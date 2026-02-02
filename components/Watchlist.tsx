@@ -32,19 +32,24 @@ const Watchlist = ({ watchlist, loading, onAdd, onUpdate, onDelete }: WatchlistP
 
   const handleAdd = async () => {
     if (!newTopic.trim()) return;
-    await onAdd({
-      topic: newTopic,
-      description: newDesc,
-      timeRange: newTimeRange,
-      customStartDate: newTimeRange === 'custom' ? newStartDate : undefined,
-      customEndDate: newTimeRange === 'custom' ? newEndDate : undefined
-    });
-    setNewTopic('');
-    setNewDesc('');
-    setNewTimeRange('last7d');
-    setNewStartDate('');
-    setNewEndDate('');
-    setIsAdding(false);
+    try {
+      await onAdd({
+        topic: newTopic,
+        description: newDesc,
+        timeRange: newTimeRange,
+        customStartDate: newTimeRange === 'custom' ? newStartDate : undefined,
+        customEndDate: newTimeRange === 'custom' ? newEndDate : undefined
+      });
+      // Only clear form on success
+      setNewTopic('');
+      setNewDesc('');
+      setNewTimeRange('last7d');
+      setNewStartDate('');
+      setNewEndDate('');
+      setIsAdding(false);
+    } catch {
+      // Error already handled by parent (toast shown), just preserve form state
+    }
   };
 
   const startEdit = (item: WatchlistItem) => {
@@ -69,14 +74,19 @@ const Watchlist = ({ watchlist, loading, onAdd, onUpdate, onDelete }: WatchlistP
     if (!editingId) return;
     const original = watchlist.find((w) => w.id === editingId);
     const nextTopic = editTopic.trim() || original?.topic || editTopic;
-    await onUpdate(editingId, {
-      topic: nextTopic,
-      description: editDesc,
-      timeRange: editTimeRange,
-      customStartDate: editTimeRange === 'custom' ? editStartDate : undefined,
-      customEndDate: editTimeRange === 'custom' ? editEndDate : undefined,
-    });
-    cancelEdit();
+    try {
+      await onUpdate(editingId, {
+        topic: nextTopic,
+        description: editDesc,
+        timeRange: editTimeRange,
+        customStartDate: editTimeRange === 'custom' ? editStartDate : undefined,
+        customEndDate: editTimeRange === 'custom' ? editEndDate : undefined,
+      });
+      // Only exit edit mode on success
+      cancelEdit();
+    } catch {
+      // Error already handled by parent (toast shown), keep edit mode open
+    }
   };
 
   const TimeRangeButton = ({
@@ -210,16 +220,19 @@ const Watchlist = ({ watchlist, loading, onAdd, onUpdate, onDelete }: WatchlistP
       )}
 
       <div className="space-y-4">
-        {loading && (
-          <Card className="animate-pulse">
-            <CardContent className="py-6">
-              <div className="h-4 bg-muted rounded w-1/3 mb-3" />
-              <div className="h-3 bg-muted/50 rounded w-2/3 mb-2" />
-              <div className="h-3 bg-muted/50 rounded w-1/2" />
-            </CardContent>
-          </Card>
+        {loading && watchlist.length === 0 && (
+          <>
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardContent className="py-6">
+                  <div className="h-4 bg-muted rounded w-1/3 mb-3" />
+                  <div className="h-3 bg-muted/50 rounded w-2/3 mb-2" />
+                  <div className="h-3 bg-muted/50 rounded w-1/2" />
+                </CardContent>
+              </Card>
+            ))}
+          </>
         )}
-
         {watchlist.map((item) => (
           <Card key={item.id} className="hover:border-accent/30 hover:shadow-sm transition-all group">
             <CardContent className="py-5">

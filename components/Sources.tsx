@@ -37,18 +37,23 @@ const Sources = ({ sources, loading, toggleSource, onAdd, onDelete }: SourcesPro
 
   const handleAdd = async () => {
     if (!newName.trim() || !newDomain.trim()) return;
-    await onAdd({
-      name: newName,
-      domain: newDomain.replace(/^https?:\/\//, '').replace(/\/$/, ''),
-      leaning: newLeaning,
-      active: true,
-      description: newDesc
-    });
-    setNewName('');
-    setNewDomain('');
-    setNewLeaning('State');
-    setNewDesc('');
-    setIsAdding(false);
+    try {
+      await onAdd({
+        name: newName,
+        domain: newDomain.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+        leaning: newLeaning,
+        active: true,
+        description: newDesc
+      });
+      // Only clear form on success
+      setNewName('');
+      setNewDomain('');
+      setNewLeaning('State');
+      setNewDesc('');
+      setIsAdding(false);
+    } catch {
+      // Error already handled by parent (toast shown), just preserve form state
+    }
   };
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
@@ -153,16 +158,19 @@ const Sources = ({ sources, loading, toggleSource, onAdd, onDelete }: SourcesPro
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {loading && (
-          <Card className="animate-pulse">
-            <CardContent className="py-6">
-              <div className="h-4 bg-muted rounded w-1/2 mb-3" />
-              <div className="h-3 bg-muted/50 rounded w-2/3 mb-2" />
-              <div className="h-3 bg-muted/50 rounded w-1/3" />
-            </CardContent>
-          </Card>
+        {loading && sources.length === 0 && (
+          <>
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardContent className="py-6">
+                  <div className="h-4 bg-muted rounded w-1/2 mb-3" />
+                  <div className="h-3 bg-muted/50 rounded w-2/3 mb-2" />
+                  <div className="h-3 bg-muted/50 rounded w-1/3" />
+                </CardContent>
+              </Card>
+            ))}
+          </>
         )}
-
         {sources.map((source) => (
           <Card
             key={source.id}

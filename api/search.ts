@@ -11,8 +11,8 @@ type SearchBody = {
   numResults?: number;
 };
 
-// Maximum domains allowed per search request (Exa API constraint)
-const MAX_DOMAINS = 25;
+// Maximum domains allowed per search request (Exa API supports up to 100)
+const MAX_DOMAINS = 50;
 
 export default async function handler(req: Request): Promise<Response> {
   try {
@@ -46,7 +46,7 @@ export default async function handler(req: Request): Promise<Response> {
     const body = {
       query,
       includeDomains: gatedDomains,
-      numResults: Math.max(1, Math.min(20, numResults ?? 5)),
+      numResults: Math.max(1, Math.min(50, numResults ?? 20)),
       contents: { text: true },
       startPublishedDate,
       endPublishedDate,

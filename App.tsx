@@ -24,6 +24,7 @@ import {
   updateSource,
   updateWatchlistItem,
 } from './lib/firestore';
+import { toast } from 'sonner';
 
 const REPORT_BATCH_LIMIT = 5;
 
@@ -132,7 +133,12 @@ const App: React.FC = () => {
     if (!user) return;
     const source = sources.find((s) => s.id === id);
     if (!source) return;
-    await updateSource(user.uid, id, { active: !source.active });
+    try {
+      await updateSource(user.uid, id, { active: !source.active });
+    } catch (error) {
+      console.error('Failed to toggle source:', error);
+      toast.error('Failed to update source. Please try again.');
+    }
   };
 
   const handleCancelMonitoring = () => {
@@ -256,15 +262,33 @@ const App: React.FC = () => {
               loading={!dataReady}
               onAdd={async (item) => {
                 if (!user) return;
-                await addWatchlistItem(user.uid, item);
+                try {
+                  await addWatchlistItem(user.uid, item);
+                  toast.success('Watchlist item added');
+                } catch (error) {
+                  console.error('Failed to add watchlist item:', error);
+                  toast.error('Failed to add item. Please try again.');
+                  throw error;
+                }
               }}
               onUpdate={async (id, updates) => {
                 if (!user) return;
-                await updateWatchlistItem(user.uid, id, updates);
+                try {
+                  await updateWatchlistItem(user.uid, id, updates);
+                } catch (error) {
+                  console.error('Failed to update watchlist item:', error);
+                  toast.error('Failed to update item. Please try again.');
+                }
               }}
               onDelete={async (id) => {
                 if (!user) return;
-                await deleteWatchlistItem(user.uid, id);
+                try {
+                  await deleteWatchlistItem(user.uid, id);
+                  toast.success('Watchlist item deleted');
+                } catch (error) {
+                  console.error('Failed to delete watchlist item:', error);
+                  toast.error('Failed to delete item. Please try again.');
+                }
               }}
             />
           )}
@@ -275,11 +299,24 @@ const App: React.FC = () => {
               toggleSource={toggleSource}
               onAdd={async (source) => {
                 if (!user) return;
-                await addSource(user.uid, source);
+                try {
+                  await addSource(user.uid, source);
+                  toast.success('Media source added');
+                } catch (error) {
+                  console.error('Failed to add source:', error);
+                  toast.error('Failed to add source. Please try again.');
+                  throw error;
+                }
               }}
               onDelete={async (id) => {
                 if (!user) return;
-                await deleteSource(user.uid, id);
+                try {
+                  await deleteSource(user.uid, id);
+                  toast.success('Media source deleted');
+                } catch (error) {
+                  console.error('Failed to delete source:', error);
+                  toast.error('Failed to delete source. Please try again.');
+                }
               }}
             />
           )}

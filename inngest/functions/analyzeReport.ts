@@ -14,9 +14,9 @@ import {
 } from "../../api/_shared";
 import { ArticleResult, CoverageMetadata, EvaluatorResult } from "../../types";
 
-const MAX_DOMAINS = 25;
-const MAX_ARTICLES = 5;
-const EVALUATOR_MAX_ARTICLES = 5;
+const MAX_DOMAINS = 50;
+const MAX_ARTICLES = 20;
+const EVALUATOR_MAX_ARTICLES = 15;
 const EVALUATOR_TIMEOUT_MS = 30000;
 
 function computeCoverageMetadata(

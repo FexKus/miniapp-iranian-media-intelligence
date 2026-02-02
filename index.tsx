@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { AuthProvider } from './contexts/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import { Toaster } from 'sonner';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -15,6 +16,7 @@ root.render(
     <ErrorBoundary>
       <AuthProvider>
         <App />
+        <Toaster position="bottom-right" richColors />
       </AuthProvider>
     </ErrorBoundary>
   </React.StrictMode>
