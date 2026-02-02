@@ -1,4 +1,4 @@
-import { getAdminAuth, getAdminDb } from "../../lib/firebaseAdmin";
+import { getAdminAuth, getAdminDb } from "../../lib/firebaseAdmin.js";
 import { Inngest } from "inngest";
 import { randomUUID } from "crypto";
 import { Timestamp } from "firebase-admin/firestore";

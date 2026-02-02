@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { inngest } from "../client";
-import { getAdminDb } from "../../lib/firebaseAdmin";
+import { inngest } from "../client.js";
+import { getAdminDb } from "../../lib/firebaseAdmin.js";
 import {
   buildConsistencyWarnings,
   isValidHostname,
@@ -11,8 +11,8 @@ import {
   validatePersianQuery,
   withRetry,
   withRetryAsync,
-} from "../../api/_shared";
-import { ArticleResult, CoverageMetadata, EvaluatorResult } from "../../types";
+} from "../../api/_shared.js";
+import { ArticleResult, CoverageMetadata, EvaluatorResult } from "../../types.js";
 
 const MAX_DOMAINS = 50;
 const MAX_ARTICLES = 20;
