@@ -1,3 +1,4 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getAdminAuth, getAdminDb } from "../../lib/firebaseAdmin.js";
 import { Inngest } from "inngest";
 import { randomUUID } from "crypto";
@@ -9,8 +10,8 @@ export const config = {
 
 const inngest = new Inngest({ id: "iranian-media-intelligence" });
 
-async function requireUserId(request: Request): Promise<string> {
-  const authHeader = request.headers.get("authorization");
+async function requireUserId(req: VercelRequest): Promise<string> {
+  const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
     throw new Error("Missing authorization");
   }
@@ -26,14 +27,14 @@ function computeExpiresAt(saved: boolean): Timestamp | null {
   return Timestamp.fromDate(expiresAt);
 }
 
-export default async function handler(req: Request): Promise<Response> {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
+    return res.status(405).send("Method Not Allowed");
   }
 
   try {
     const userId = await requireUserId(req);
-    const payload = await req.json();
+    const payload = req.body;
 
     const {
       watchlistItemId,
@@ -48,7 +49,7 @@ export default async function handler(req: Request): Promise<Response> {
     } = payload || {};
 
     if (!watchlistItemId || !topic || !Array.isArray(domains) || !idempotencyKey) {
-      return new Response("Missing required fields", { status: 400 });
+      return res.status(400).send("Missing required fields");
     }
 
     const db = getAdminDb();
@@ -61,10 +62,10 @@ export default async function handler(req: Request): Promise<Response> {
 
     if (!existingSnap.empty) {
       const existing = existingSnap.docs[0];
-      return new Response(
-        JSON.stringify({ reportId: existing.id, status: existing.get("status") || "pending" }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      );
+      return res.status(200).json({
+        reportId: existing.id,
+        status: existing.get("status") || "pending",
+      });
     }
 
     const now = Timestamp.now();
@@ -96,12 +97,9 @@ export default async function handler(req: Request): Promise<Response> {
       },
     });
 
-    return new Response(JSON.stringify({ reportId, status: "pending" }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return res.status(200).json({ reportId, status: "pending" });
   } catch (error: any) {
     console.error("Create report failed", error);
-    return new Response(error?.message || "Internal Server Error", { status: 500 });
+    return res.status(500).send(error?.message || "Internal Server Error");
   }
 }
