@@ -59,6 +59,7 @@ const App: React.FC = () => {
     watchlistReadyRef.current = false;
     sourcesReadyRef.current = false;
     reportsReadyRef.current = false;
+    seededRef.current = false;  // Reset for each user to ensure new users get defaults
 
     const maybeReady = () => {
       if (watchlistReadyRef.current && sourcesReadyRef.current && reportsReadyRef.current) {
