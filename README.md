@@ -492,6 +492,7 @@ Features designed but not yet implemented:
 - **Fixed:** API routes converted to `VercelRequest`/`VercelResponse` pattern
 - **Fixed:** Inngest import changed to `inngest/next` for Node.js runtime
 - **Fixed:** Environment variable documentation clarified (VITE_ vs non-VITE)
+- **Fixed:** Auto-seeding now works for new users (reset seededRef on user change)
 - All functionality verified working in production
 
 ### V3 (February 2026)

@@ -462,6 +462,7 @@ npm run lint
 - **Fixed:** API routes converted to `VercelRequest`/`VercelResponse` (was causing TypeError)
 - **Fixed:** Inngest import changed to `inngest/next` (was causing sync failures)
 - **Fixed:** Environment variable documentation (VITE_ vs non-VITE distinction)
+- **Fixed:** Auto-seeding for new users (seededRef now resets when user changes)
 - All functionality verified working in production
 
 ### V3 (February 2026)
