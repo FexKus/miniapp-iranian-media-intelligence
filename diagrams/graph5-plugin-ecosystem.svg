@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 850" font-family="Inter, system-ui, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="850" fill="#FAFAFA"/>
+
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#1a1a1a">Graph 5: Plugin Ecosystem</text>
+  <text x="450" y="65" text-anchor="middle" font-size="14" fill="#666">Multiple Skills Bundled as a Plugin</text>
+
+  <!-- Era Badge -->
+  <rect x="350" y="80" width="200" height="28" rx="14" fill="#EC4899"/>
+  <text x="450" y="99" text-anchor="middle" font-size="12" font-weight="600" fill="white">🧩 Plugin Architecture</text>
+
+  <!-- User -->
+  <circle cx="450" cy="155" r="30" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="450" y="152" text-anchor="middle" font-size="18">👤</text>
+  <text x="450" y="168" text-anchor="middle" font-size="8" fill="#1E40AF">User</text>
+
+  <!-- Arrow -->
+  <path d="M450 185 L450 210" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow5)"/>
+
+  <!-- Claude Interface -->
+  <rect x="275" y="220" width="350" height="50" rx="10" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="2"/>
+  <text x="450" y="250" text-anchor="middle" font-size="14" font-weight="600" fill="#5B21B6">Claude Desktop / API</text>
+
+  <!-- Arrow -->
+  <path d="M450 270 L450 300" stroke="#EC4899" stroke-width="2" marker-end="url(#arrow-pink)"/>
+  <text x="470" y="290" font-size="10" fill="#EC4899">loads</text>
+
+  <!-- PLUGIN CONTAINER -->
+  <rect x="100" y="310" width="700" height="480" rx="20" fill="white" stroke="#EC4899" stroke-width="3"/>
+
+  <!-- Plugin Header -->
+  <rect x="100" y="310" width="700" height="55" rx="20" fill="#EC4899"/>
+  <text x="140" y="345" font-size="16" font-weight="700" fill="white">🧩 Intelligence Analysis Plugin</text>
+  <text x="760" y="345" text-anchor="end" font-size="11" fill="#FBCFE8">v1.0.0</text>
+
+  <!-- Plugin Manifest -->
+  <rect x="120" y="380" width="260" height="60" rx="8" fill="#FCE7F3"/>
+  <text x="140" y="402" font-size="10" font-weight="600" fill="#9D174D">plugin.json</text>
+  <text x="140" y="420" font-size="9" fill="#6B7280">name: "intelligence-analysis"</text>
+  <text x="140" y="433" font-size="9" fill="#6B7280">skills: [media-monitor, report-gen, ...]</text>
+
+  <!-- MCP Servers -->
+  <rect x="400" y="380" width="380" height="60" rx="8" fill="#DBEAFE"/>
+  <text x="420" y="402" font-size="10" font-weight="600" fill="#1E40AF">MCP Servers (Shared)</text>
+  <rect x="420" y="415" width="70" height="20" rx="4" fill="white" stroke="#3B82F6"/>
+  <text x="455" y="429" text-anchor="middle" font-size="8" fill="#1E40AF">Exa AI</text>
+  <rect x="500" y="415" width="70" height="20" rx="4" fill="white" stroke="#3B82F6"/>
+  <text x="535" y="429" text-anchor="middle" font-size="8" fill="#1E40AF">Firebase</text>
+  <rect x="580" y="415" width="70" height="20" rx="4" fill="white" stroke="#3B82F6"/>
+  <text x="615" y="429" text-anchor="middle" font-size="8" fill="#1E40AF">Gemini</text>
+  <rect x="660" y="415" width="100" height="20" rx="4" fill="white" stroke="#3B82F6"/>
+  <text x="710" y="429" text-anchor="middle" font-size="8" fill="#1E40AF">Slack/Email</text>
+
+  <!-- Skills Container -->
+  <text x="140" y="470" font-size="12" font-weight="600" fill="#1a1a1a">Skills:</text>
+
+  <!-- Skill 1: Media Monitor (our skill) -->
+  <rect x="120" y="485" width="200" height="140" rx="12" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="2"/>
+  <rect x="120" y="485" width="200" height="30" rx="12" fill="#8B5CF6"/>
+  <text x="220" y="505" text-anchor="middle" font-size="10" font-weight="600" fill="white">📡 media-monitor</text>
+  <text x="140" y="535" font-size="9" fill="#5B21B6">@Persian_Translator</text>
+  <text x="140" y="550" font-size="9" fill="#5B21B6">@Article_Searcher</text>
+  <text x="140" y="565" font-size="9" fill="#5B21B6">@Intelligence_Analyst</text>
+  <text x="140" y="580" font-size="9" fill="#5B21B6">@Evaluator_Agent</text>
+  <rect x="130" y="595" width="180" height="20" rx="4" fill="#DDD6FE"/>
+  <text x="220" y="609" text-anchor="middle" font-size="8" fill="#5B21B6">⭐ Our Skill</text>
+
+  <!-- Skill 2: Report Generator -->
+  <rect x="340" y="485" width="200" height="140" rx="12" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
+  <rect x="340" y="485" width="200" height="30" rx="12" fill="#10B981"/>
+  <text x="440" y="505" text-anchor="middle" font-size="10" font-weight="600" fill="white">📄 report-generator</text>
+  <text x="360" y="535" font-size="9" fill="#065F46">@PDF_Creator</text>
+  <text x="360" y="550" font-size="9" fill="#065F46">@DOCX_Writer</text>
+  <text x="360" y="565" font-size="9" fill="#065F46">@Chart_Builder</text>
+  <text x="360" y="580" font-size="9" fill="#065F46">@Template_Engine</text>
+  <rect x="350" y="595" width="180" height="20" rx="4" fill="#A7F3D0"/>
+  <text x="440" y="609" text-anchor="middle" font-size="8" fill="#065F46">Format outputs</text>
+
+  <!-- Skill 3: Distribution -->
+  <rect x="560" y="485" width="220" height="140" rx="12" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <rect x="560" y="485" width="220" height="30" rx="12" fill="#F59E0B"/>
+  <text x="670" y="505" text-anchor="middle" font-size="10" font-weight="600" fill="white">📤 distribution</text>
+  <text x="580" y="535" font-size="9" fill="#92400E">@Email_Sender</text>
+  <text x="580" y="550" font-size="9" fill="#92400E">@Slack_Notifier</text>
+  <text x="580" y="565" font-size="9" fill="#92400E">@Calendar_Scheduler</text>
+  <text x="580" y="580" font-size="9" fill="#92400E">@Webhook_Trigger</text>
+  <rect x="570" y="595" width="200" height="20" rx="4" fill="#FDE68A"/>
+  <text x="670" y="609" text-anchor="middle" font-size="8" fill="#92400E">Deliver to stakeholders</text>
+
+  <!-- Skill 4: Archive -->
+  <rect x="120" y="640" width="200" height="80" rx="12" fill="#F3F4F6" stroke="#6B7280" stroke-width="2"/>
+  <rect x="120" y="640" width="200" height="30" rx="12" fill="#6B7280"/>
+  <text x="220" y="660" text-anchor="middle" font-size="10" font-weight="600" fill="white">🗄️ archive</text>
+  <text x="140" y="690" font-size="9" fill="#4B5563">@Version_Controller</text>
+  <text x="140" y="705" font-size="9" fill="#4B5563">@Search_Index</text>
+
+  <!-- Skill 5: Alerts -->
+  <rect x="340" y="640" width="200" height="80" rx="12" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+  <rect x="340" y="640" width="200" height="30" rx="12" fill="#EF4444"/>
+  <text x="440" y="660" text-anchor="middle" font-size="10" font-weight="600" fill="white">🚨 alerts</text>
+  <text x="360" y="690" font-size="9" fill="#7F1D1D">@Threshold_Monitor</text>
+  <text x="360" y="705" font-size="9" fill="#7F1D1D">@Anomaly_Detector</text>
+
+  <!-- Skill 6: Dashboard -->
+  <rect x="560" y="640" width="220" height="80" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <rect x="560" y="640" width="220" height="30" rx="12" fill="#3B82F6"/>
+  <text x="670" y="660" text-anchor="middle" font-size="10" font-weight="600" fill="white">📊 dashboard</text>
+  <text x="580" y="690" font-size="9" fill="#1E40AF">@Widget_Renderer</text>
+  <text x="580" y="705" font-size="9" fill="#1E40AF">@Real_Time_Updates</text>
+
+  <!-- Workflow Arrow -->
+  <path d="M320 555 L340 555" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="4,2"/>
+  <path d="M540 555 L560 555" stroke="#10B981" stroke-width="2" stroke-dasharray="4,2"/>
+
+  <!-- Output -->
+  <rect x="300" y="800" width="300" height="40" rx="20" fill="#10B981" stroke="#059669" stroke-width="2"/>
+  <text x="450" y="826" text-anchor="middle" font-size="12" font-weight="600" fill="white">🎯 Complete Intelligence Workflow</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrow5" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrow-pink" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#EC4899"/>
+    </marker>
+  </defs>
+</svg>

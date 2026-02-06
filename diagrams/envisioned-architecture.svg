@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" font-family="Inter, system-ui, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="1100" fill="#FAFAFA"/>
+
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#1a1a1a">Envisioned Architecture</text>
+  <text x="450" y="65" text-anchor="middle" font-size="14" fill="#666">Parallel Search Agents</text>
+
+  <!-- User Trigger -->
+  <rect x="300" y="90" width="300" height="50" rx="25" fill="#3B82F6" stroke="#2563EB" stroke-width="2"/>
+  <text x="450" y="122" text-anchor="middle" font-size="14" font-weight="600" fill="white">👤 User: "Run Monitoring"</text>
+
+  <!-- Arrow 1 -->
+  <path d="M450 140 L450 170" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+  <!-- Step 1: Translate -->
+  <rect x="225" y="180" width="450" height="70" rx="12" fill="white" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="225" y="180" width="450" height="28" rx="12" fill="#F1F5F9"/>
+  <text x="245" y="198" font-size="11" font-weight="600" fill="#64748B">STEP 1</text>
+  <text x="450" y="220" text-anchor="middle" font-size="15" font-weight="600" fill="#1a1a1a">@Persian_Translator</text>
+  <text x="450" y="240" text-anchor="middle" font-size="11" fill="#666">Gemini 2.0 Flash → Persian search query</text>
+
+  <!-- Arrow 2 -->
+  <path d="M450 250 L450 280" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+  <!-- Step 2: Domain Router (NEW) -->
+  <rect x="225" y="290" width="450" height="70" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <rect x="225" y="290" width="450" height="28" rx="12" fill="#93C5FD"/>
+  <text x="245" y="308" font-size="11" font-weight="600" fill="#1E40AF">STEP 2 ✨ NEW</text>
+  <text x="450" y="330" text-anchor="middle" font-size="15" font-weight="600" fill="#1E40AF">@Domain_Router</text>
+  <text x="450" y="350" text-anchor="middle" font-size="11" fill="#1E3A8A">Split domains into parallel chunks (10-15 each)</text>
+
+  <!-- Branching arrows -->
+  <path d="M450 360 L450 390 L200 390 L200 420" stroke="#3B82F6" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+  <path d="M450 360 L450 420" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M450 360 L450 390 L700 390 L700 420" stroke="#3B82F6" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+  <!-- Step 3: Parallel Search Agents -->
+  <rect x="100" y="430" width="200" height="120" rx="12" fill="white" stroke="#10B981" stroke-width="2"/>
+  <rect x="100" y="430" width="200" height="28" rx="12" fill="#D1FAE5"/>
+  <text x="200" y="448" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46">AGENT 1</text>
+  <text x="200" y="475" text-anchor="middle" font-size="14" font-weight="600" fill="#1a1a1a">@Search_Agent</text>
+  <text x="200" y="495" text-anchor="middle" font-size="10" fill="#666">Exa AI</text>
+  <text x="200" y="515" text-anchor="middle" font-size="10" fill="#059669">Domains 1-10</text>
+  <text x="200" y="535" text-anchor="middle" font-size="10" fill="#059669">→ 20 articles</text>
+
+  <rect x="350" y="430" width="200" height="120" rx="12" fill="white" stroke="#10B981" stroke-width="2"/>
+  <rect x="350" y="430" width="200" height="28" rx="12" fill="#D1FAE5"/>
+  <text x="450" y="448" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46">AGENT 2</text>
+  <text x="450" y="475" text-anchor="middle" font-size="14" font-weight="600" fill="#1a1a1a">@Search_Agent</text>
+  <text x="450" y="495" text-anchor="middle" font-size="10" fill="#666">Exa AI</text>
+  <text x="450" y="515" text-anchor="middle" font-size="10" fill="#059669">Domains 11-20</text>
+  <text x="450" y="535" text-anchor="middle" font-size="10" fill="#059669">→ 20 articles</text>
+
+  <rect x="600" y="430" width="200" height="120" rx="12" fill="white" stroke="#10B981" stroke-width="2"/>
+  <rect x="600" y="430" width="200" height="28" rx="12" fill="#D1FAE5"/>
+  <text x="700" y="448" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46">AGENT 3</text>
+  <text x="700" y="475" text-anchor="middle" font-size="14" font-weight="600" fill="#1a1a1a">@Search_Agent</text>
+  <text x="700" y="495" text-anchor="middle" font-size="10" fill="#666">Exa AI</text>
+  <text x="700" y="515" text-anchor="middle" font-size="10" fill="#059669">Domains 21-30</text>
+  <text x="700" y="535" text-anchor="middle" font-size="10" fill="#059669">→ 20 articles</text>
+
+  <!-- Parallel indicator -->
+  <rect x="780" y="470" width="100" height="40" rx="8" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1"/>
+  <text x="830" y="485" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46">⚡ Parallel</text>
+  <text x="830" y="500" text-anchor="middle" font-size="10" fill="#065F46">Promise.all()</text>
+
+  <!-- Merging arrows -->
+  <path d="M200 550 L200 580 L450 580" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M450 550 L450 580" stroke="#10B981" stroke-width="2"/>
+  <path d="M700 550 L700 580 L450 580" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M450 580 L450 610" stroke="#10B981" stroke-width="2" marker-end="url(#arrow-green)"/>
+
+  <!-- Step 4: Merge -->
+  <rect x="225" y="620" width="450" height="70" rx="12" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <rect x="225" y="620" width="450" height="28" rx="12" fill="#93C5FD"/>
+  <text x="245" y="638" font-size="11" font-weight="600" fill="#1E40AF">STEP 4 ✨ NEW</text>
+  <text x="450" y="660" text-anchor="middle" font-size="15" font-weight="600" fill="#1E40AF">@Result_Merger</text>
+  <text x="450" y="680" text-anchor="middle" font-size="11" fill="#1E3A8A">Combine + Dedupe by URL → Up to 60 articles</text>
+
+  <!-- Arrow -->
+  <path d="M450 690 L450 720" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+  <!-- Step 5: Validate -->
+  <rect x="225" y="730" width="450" height="70" rx="12" fill="white" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="225" y="730" width="450" height="28" rx="12" fill="#F1F5F9"/>
+  <text x="245" y="748" font-size="11" font-weight="600" fill="#64748B">STEP 5</text>
+  <text x="450" y="770" text-anchor="middle" font-size="15" font-weight="600" fill="#1a1a1a">@Quality_Validator</text>
+  <text x="450" y="790" text-anchor="middle" font-size="11" fill="#666">Filter junk • Tag evidence quality • Cap at 50</text>
+
+  <!-- Arrow -->
+  <path d="M450 800 L450 830" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+  <!-- Step 6: Analyze -->
+  <rect x="225" y="840" width="450" height="70" rx="12" fill="white" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="225" y="840" width="450" height="28" rx="12" fill="#F1F5F9"/>
+  <text x="245" y="858" font-size="11" font-weight="600" fill="#64748B">STEP 6</text>
+  <text x="450" y="880" text-anchor="middle" font-size="15" font-weight="600" fill="#1a1a1a">@Intelligence_Analyst</text>
+  <text x="450" y="900" text-anchor="middle" font-size="11" fill="#666">Gemini → Richer analysis with more sources</text>
+
+  <!-- Arrow -->
+  <path d="M450 910 L450 940" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+  <!-- Step 7: Evaluate -->
+  <rect x="225" y="950" width="450" height="70" rx="12" fill="white" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="225" y="950" width="450" height="28" rx="12" fill="#F1F5F9"/>
+  <text x="245" y="968" font-size="11" font-weight="600" fill="#64748B">STEP 7</text>
+  <text x="450" y="990" text-anchor="middle" font-size="15" font-weight="600" fill="#1a1a1a">@Evaluator_Agent</text>
+  <text x="450" y="1010" text-anchor="middle" font-size="11" fill="#666">Citation score • Faithfulness score • Issues</text>
+
+  <!-- Arrow -->
+  <path d="M450 1020 L450 1040" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+  <!-- Output -->
+  <rect x="300" y="1050" width="300" height="40" rx="20" fill="#10B981" stroke="#059669" stroke-width="2"/>
+  <text x="450" y="1076" text-anchor="middle" font-size="13" font-weight="600" fill="white">📊 Dashboard (Real-time)</text>
+
+  <!-- Stats Box -->
+  <rect x="20" y="620" width="160" height="120" rx="8" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1"/>
+  <text x="100" y="645" text-anchor="middle" font-size="12" font-weight="600" fill="#065F46">✅ Improvements</text>
+  <text x="100" y="670" text-anchor="middle" font-size="11" fill="#065F46">50 articles max</text>
+  <text x="100" y="690" text-anchor="middle" font-size="11" fill="#065F46">~5-8s search time</text>
+  <text x="100" y="710" text-anchor="middle" font-size="11" fill="#065F46">3x faster</text>
+  <text x="100" y="730" text-anchor="middle" font-size="11" fill="#065F46">Better coverage</text>
+
+  <!-- Arrow marker definitions -->
+  <defs>
+    <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3B82F6"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10B981"/>
+    </marker>
+  </defs>
+</svg>

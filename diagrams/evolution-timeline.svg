@@ -1,0 +1,312 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 750" font-family="Inter, system-ui, sans-serif">
+  <!-- Background -->
+  <rect width="1600" height="750" fill="#FAFAFA"/>
+
+  <!-- Main Title -->
+  <text x="800" y="45" text-anchor="middle" font-size="28" font-weight="700" fill="#1a1a1a">The Evolution of Software: From Rule-Based to Autonomous Agents</text>
+  <text x="800" y="75" text-anchor="middle" font-size="14" fill="#666">A journey through 6 architectural paradigms</text>
+
+  <!-- TIMELINE BAR -->
+  <rect x="100" y="100" width="1400" height="8" rx="4" fill="#E2E8F0"/>
+
+  <!-- Timeline gradient overlay -->
+  <defs>
+    <linearGradient id="timelineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6B7280"/>
+      <stop offset="20%" style="stop-color:#DC2626"/>
+      <stop offset="40%" style="stop-color:#10B981"/>
+      <stop offset="60%" style="stop-color:#8B5CF6"/>
+      <stop offset="80%" style="stop-color:#EC4899"/>
+      <stop offset="100%" style="stop-color:#0EA5E9"/>
+    </linearGradient>
+    <marker id="arr-sm" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L8,3 z" fill="#9CA3AF"/>
+    </marker>
+    <marker id="arr-green-sm" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L8,3 z" fill="#10B981"/>
+    </marker>
+    <marker id="arr-cyan-sm" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L8,3 z" fill="#0EA5E9"/>
+    </marker>
+  </defs>
+  <rect x="100" y="100" width="1400" height="8" rx="4" fill="url(#timelineGrad)"/>
+
+  <!-- Timeline dots and labels -->
+  <!-- Stage 1 -->
+  <circle cx="180" cy="104" r="12" fill="#6B7280" stroke="white" stroke-width="3"/>
+  <text x="180" y="85" text-anchor="middle" font-size="10" font-weight="600" fill="#6B7280">2010-2022</text>
+
+  <!-- Stage 2 -->
+  <circle cx="420" cy="104" r="12" fill="#DC2626" stroke="white" stroke-width="3"/>
+  <text x="420" y="85" text-anchor="middle" font-size="10" font-weight="600" fill="#DC2626">2023</text>
+
+  <!-- Stage 3 -->
+  <circle cx="660" cy="104" r="12" fill="#10B981" stroke="white" stroke-width="3"/>
+  <text x="660" y="85" text-anchor="middle" font-size="10" font-weight="600" fill="#10B981">2024</text>
+
+  <!-- Stage 4 -->
+  <circle cx="900" cy="104" r="12" fill="#8B5CF6" stroke="white" stroke-width="3"/>
+  <text x="900" y="85" text-anchor="middle" font-size="10" font-weight="600" fill="#8B5CF6">2025</text>
+
+  <!-- Stage 5 -->
+  <circle cx="1180" cy="104" r="12" fill="#EC4899" stroke="white" stroke-width="3"/>
+  <text x="1180" y="85" text-anchor="middle" font-size="10" font-weight="600" fill="#EC4899">2025+</text>
+
+  <!-- Stage 6 -->
+  <circle cx="1420" cy="104" r="12" fill="#0EA5E9" stroke="white" stroke-width="3"/>
+  <text x="1420" y="85" text-anchor="middle" font-size="10" font-weight="600" fill="#0EA5E9">Future</text>
+
+  <!-- STAGE 1: Pre-GenAI Software -->
+  <rect x="50" y="140" width="230" height="450" rx="16" fill="white" stroke="#6B7280" stroke-width="2"/>
+  <rect x="50" y="140" width="230" height="45" rx="16" fill="#6B7280"/>
+  <text x="165" y="168" text-anchor="middle" font-size="13" font-weight="700" fill="white">1. Pre-GenAI Software</text>
+
+  <text x="165" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#4B5563">RSS + Keywords + ML</text>
+
+  <!-- Data sources -->
+  <rect x="70" y="220" width="75" height="22" rx="4" fill="#DBEAFE"/>
+  <text x="107" y="235" text-anchor="middle" font-size="7" fill="#1E40AF">RSS Feeds</text>
+  <rect x="150" y="220" width="75" height="22" rx="4" fill="#DBEAFE"/>
+  <text x="187" y="235" text-anchor="middle" font-size="7" fill="#1E40AF">APIs</text>
+
+  <path d="M165 242 L165 255" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="75" y="260" width="180" height="28" rx="6" fill="#FEF3C7" stroke="#F59E0B"/>
+  <text x="165" y="278" text-anchor="middle" font-size="9" fill="#92400E">Keyword + Rule Engine</text>
+
+  <path d="M165 288 L165 301" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="75" y="306" width="180" height="28" rx="6" fill="#F5F3FF" stroke="#8B5CF6"/>
+  <text x="165" y="324" text-anchor="middle" font-size="9" fill="#5B21B6">ML Classifiers (fixed)</text>
+
+  <path d="M165 334 L165 347" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="75" y="352" width="180" height="28" rx="6" fill="#E5E7EB"/>
+  <text x="165" y="370" text-anchor="middle" font-size="9" fill="#4B5563">Database + Dashboard</text>
+
+  <path d="M165 380 L165 393" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="75" y="398" width="180" height="28" rx="6" fill="#FEE2E2"/>
+  <text x="165" y="416" text-anchor="middle" font-size="9" fill="#991B1B">Human writes report</text>
+
+  <!-- Stats -->
+  <rect x="70" y="440" width="190" height="70" rx="8" fill="#F3F4F6"/>
+  <text x="165" y="460" text-anchor="middle" font-size="9" font-weight="600" fill="#4B5563">Limitations:</text>
+  <text x="165" y="478" text-anchor="middle" font-size="8" fill="#6B7280">No semantic understanding</text>
+  <text x="165" y="493" text-anchor="middle" font-size="8" fill="#6B7280">No content generation</text>
+  <text x="165" y="508" text-anchor="middle" font-size="8" fill="#6B7280">Manual synthesis required</text>
+
+  <rect x="70" y="520" width="190" height="35" rx="8" fill="#6B7280"/>
+  <text x="165" y="543" text-anchor="middle" font-size="10" font-weight="600" fill="white">Filtered Data + Alerts</text>
+
+  <!-- STAGE 2: AI v1.0 -->
+  <rect x="295" y="140" width="230" height="450" rx="16" fill="white" stroke="#DC2626" stroke-width="2"/>
+  <rect x="295" y="140" width="230" height="45" rx="16" fill="#DC2626"/>
+  <text x="410" y="168" text-anchor="middle" font-size="13" font-weight="700" fill="white">2. GenAI Pipeline v1</text>
+
+  <text x="410" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#991B1B">Sequential LLM Agents</text>
+
+  <rect x="320" y="225" width="180" height="25" rx="6" fill="#DBEAFE"/>
+  <text x="410" y="242" text-anchor="middle" font-size="9" fill="#1E40AF">Translate (LLM)</text>
+
+  <path d="M410 250 L410 260" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="320" y="265" width="180" height="25" rx="6" fill="#FEE2E2" stroke="#F87171"/>
+  <text x="410" y="282" text-anchor="middle" font-size="9" fill="#991B1B">Semantic Search (Exa)</text>
+
+  <path d="M410 290 L410 300" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="320" y="305" width="180" height="25" rx="6" fill="#DBEAFE"/>
+  <text x="410" y="322" text-anchor="middle" font-size="9" fill="#1E40AF">Validate</text>
+
+  <path d="M410 330 L410 340" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="320" y="345" width="180" height="25" rx="6" fill="#DBEAFE"/>
+  <text x="410" y="362" text-anchor="middle" font-size="9" fill="#1E40AF">Analyze (LLM)</text>
+
+  <path d="M410 370 L410 380" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="320" y="385" width="180" height="25" rx="6" fill="#DBEAFE"/>
+  <text x="410" y="402" text-anchor="middle" font-size="9" fill="#1E40AF">Evaluate (LLM)</text>
+
+  <rect x="315" y="440" width="190" height="70" rx="8" fill="#FEF2F2"/>
+  <text x="410" y="460" text-anchor="middle" font-size="9" font-weight="600" fill="#991B1B">Breakthrough:</text>
+  <text x="410" y="478" text-anchor="middle" font-size="8" fill="#7F1D1D">Semantic search</text>
+  <text x="410" y="493" text-anchor="middle" font-size="8" fill="#7F1D1D">Auto-translation</text>
+  <text x="410" y="508" text-anchor="middle" font-size="8" fill="#7F1D1D">Generated briefings</text>
+
+  <rect x="315" y="520" width="190" height="35" rx="8" fill="#DC2626"/>
+  <text x="410" y="543" text-anchor="middle" font-size="10" font-weight="600" fill="white">Intelligence Report</text>
+
+  <!-- STAGE 3: AI v2.0 -->
+  <rect x="540" y="140" width="230" height="450" rx="16" fill="white" stroke="#10B981" stroke-width="2"/>
+  <rect x="540" y="140" width="230" height="45" rx="16" fill="#10B981"/>
+  <text x="655" y="168" text-anchor="middle" font-size="13" font-weight="700" fill="white">3. GenAI Pipeline v2</text>
+
+  <text x="655" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#065F46">Parallel LLM Agents</text>
+
+  <rect x="565" y="225" width="180" height="25" rx="6" fill="#DBEAFE"/>
+  <text x="655" y="242" text-anchor="middle" font-size="9" fill="#1E40AF">Translate</text>
+
+  <path d="M655 250 L655 260" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="565" y="265" width="180" height="25" rx="6" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="655" y="282" text-anchor="middle" font-size="9" fill="#065F46">Domain Router [NEW]</text>
+
+  <!-- Parallel branches -->
+  <path d="M605 290 L605 305" stroke="#10B981" stroke-width="1.5"/>
+  <path d="M655 290 L655 305" stroke="#10B981" stroke-width="1.5"/>
+  <path d="M705 290 L705 305" stroke="#10B981" stroke-width="1.5"/>
+
+  <rect x="575" y="305" width="55" height="22" rx="4" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="602" y="320" text-anchor="middle" font-size="7" fill="#065F46">S1</text>
+
+  <rect x="632" y="305" width="55" height="22" rx="4" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="660" y="320" text-anchor="middle" font-size="7" fill="#065F46">S2</text>
+
+  <rect x="689" y="305" width="55" height="22" rx="4" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="716" y="320" text-anchor="middle" font-size="7" fill="#065F46">S3</text>
+
+  <text x="755" y="320" font-size="8" fill="#10B981">3x</text>
+
+  <path d="M605 327 L605 337 L655 337" stroke="#10B981" stroke-width="1"/>
+  <path d="M655 327 L655 337" stroke="#10B981" stroke-width="1"/>
+  <path d="M705 327 L705 337 L655 337" stroke="#10B981" stroke-width="1"/>
+  <path d="M655 337 L655 350" stroke="#10B981" stroke-width="1.5" marker-end="url(#arr-green-sm)"/>
+
+  <rect x="565" y="355" width="180" height="25" rx="6" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="655" y="372" text-anchor="middle" font-size="9" fill="#065F46">Merge + Dedupe [NEW]</text>
+
+  <path d="M655 380 L655 390" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="565" y="395" width="180" height="20" rx="4" fill="#DBEAFE"/>
+  <text x="655" y="409" text-anchor="middle" font-size="8" fill="#1E40AF">Validate - Analyze - Evaluate</text>
+
+  <rect x="560" y="440" width="190" height="70" rx="8" fill="#ECFDF5"/>
+  <text x="655" y="460" text-anchor="middle" font-size="9" font-weight="600" fill="#065F46">Improvements:</text>
+  <text x="655" y="478" text-anchor="middle" font-size="8" fill="#065F46">3x faster (parallel)</text>
+  <text x="655" y="493" text-anchor="middle" font-size="8" fill="#065F46">50 articles (vs 20)</text>
+  <text x="655" y="508" text-anchor="middle" font-size="8" fill="#065F46">Better coverage</text>
+
+  <rect x="560" y="520" width="190" height="35" rx="8" fill="#10B981"/>
+  <text x="655" y="543" text-anchor="middle" font-size="10" font-weight="600" fill="white">Enhanced Report</text>
+
+  <!-- STAGE 4: Skill -->
+  <rect x="785" y="140" width="230" height="450" rx="16" fill="white" stroke="#8B5CF6" stroke-width="2"/>
+  <rect x="785" y="140" width="230" height="45" rx="16" fill="#8B5CF6"/>
+  <text x="900" y="168" text-anchor="middle" font-size="13" font-weight="700" fill="white">4. Claude Skill</text>
+
+  <text x="900" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#5B21B6">Packaged + Reusable</text>
+
+  <rect x="810" y="225" width="180" height="35" rx="6" fill="#F5F3FF" stroke="#8B5CF6"/>
+  <text x="900" y="247" text-anchor="middle" font-size="9" fill="#5B21B6">SKILL.md</text>
+
+  <rect x="810" y="270" width="180" height="70" rx="6" fill="#F5F3FF"/>
+  <text x="830" y="290" font-size="8" fill="#5B21B6">Metadata + Triggers</text>
+  <text x="830" y="305" font-size="8" fill="#5B21B6">Unified Prompts</text>
+  <text x="830" y="320" font-size="8" fill="#5B21B6">Agent Definitions</text>
+  <text x="830" y="335" font-size="8" fill="#5B21B6">MCP Connections</text>
+
+  <rect x="810" y="350" width="180" height="55" rx="6" fill="#DBEAFE"/>
+  <text x="900" y="372" text-anchor="middle" font-size="9" font-weight="600" fill="#1E40AF">Claude Desktop</text>
+  <text x="900" y="392" text-anchor="middle" font-size="8" fill="#1E3A8A">"Invoke media-monitor"</text>
+
+  <rect x="805" y="440" width="190" height="70" rx="8" fill="#F5F3FF"/>
+  <text x="900" y="460" text-anchor="middle" font-size="9" font-weight="600" fill="#5B21B6">Benefits:</text>
+  <text x="900" y="478" text-anchor="middle" font-size="8" fill="#5B21B6">Reusable across projects</text>
+  <text x="900" y="493" text-anchor="middle" font-size="8" fill="#5B21B6">Versioned + shareable</text>
+  <text x="900" y="508" text-anchor="middle" font-size="8" fill="#5B21B6">Documented interface</text>
+
+  <rect x="805" y="520" width="190" height="35" rx="8" fill="#8B5CF6"/>
+  <text x="900" y="543" text-anchor="middle" font-size="10" font-weight="600" fill="white">Invokable Skill</text>
+
+  <!-- STAGE 5: Plugin -->
+  <rect x="1055" y="140" width="230" height="450" rx="16" fill="white" stroke="#EC4899" stroke-width="2"/>
+  <rect x="1055" y="140" width="230" height="45" rx="16" fill="#EC4899"/>
+  <text x="1170" y="168" text-anchor="middle" font-size="13" font-weight="700" fill="white">5. Plugin Bundle</text>
+
+  <text x="1170" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#9D174D">Multi-Skill Ecosystem</text>
+
+  <rect x="1080" y="225" width="180" height="35" rx="6" fill="#FCE7F3" stroke="#EC4899"/>
+  <text x="1170" y="247" text-anchor="middle" font-size="9" fill="#9D174D">plugin.json</text>
+
+  <!-- Skills grid -->
+  <rect x="1080" y="270" width="85" height="28" rx="4" fill="#F5F3FF" stroke="#8B5CF6"/>
+  <text x="1122" y="288" text-anchor="middle" font-size="7" fill="#5B21B6">monitor</text>
+
+  <rect x="1175" y="270" width="85" height="28" rx="4" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="1217" y="288" text-anchor="middle" font-size="7" fill="#065F46">report</text>
+
+  <rect x="1080" y="305" width="85" height="28" rx="4" fill="#FEF3C7" stroke="#F59E0B"/>
+  <text x="1122" y="323" text-anchor="middle" font-size="7" fill="#92400E">distribute</text>
+
+  <rect x="1175" y="305" width="85" height="28" rx="4" fill="#FEE2E2" stroke="#EF4444"/>
+  <text x="1217" y="323" text-anchor="middle" font-size="7" fill="#991B1B">alerts</text>
+
+  <rect x="1080" y="345" width="180" height="55" rx="6" fill="#DBEAFE"/>
+  <text x="1170" y="367" text-anchor="middle" font-size="9" font-weight="600" fill="#1E40AF">Shared MCP Layer</text>
+  <text x="1170" y="387" text-anchor="middle" font-size="8" fill="#1E3A8A">Exa / Firebase / Gemini / Slack</text>
+
+  <rect x="1075" y="440" width="190" height="70" rx="8" fill="#FCE7F3"/>
+  <text x="1170" y="460" text-anchor="middle" font-size="9" font-weight="600" fill="#9D174D">Benefits:</text>
+  <text x="1170" y="478" text-anchor="middle" font-size="8" fill="#9D174D">Composable workflows</text>
+  <text x="1170" y="493" text-anchor="middle" font-size="8" fill="#9D174D">Shared infrastructure</text>
+  <text x="1170" y="508" text-anchor="middle" font-size="8" fill="#9D174D">End-to-end automation</text>
+
+  <rect x="1075" y="520" width="190" height="35" rx="8" fill="#EC4899"/>
+  <text x="1170" y="543" text-anchor="middle" font-size="10" font-weight="600" fill="white">Full Workflow</text>
+
+  <!-- STAGE 6: Bot -->
+  <rect x="1300" y="140" width="250" height="450" rx="16" fill="white" stroke="#0EA5E9" stroke-width="2"/>
+  <rect x="1300" y="140" width="250" height="45" rx="16" fill="#0EA5E9"/>
+  <text x="1425" y="168" text-anchor="middle" font-size="13" font-weight="700" fill="white">6. Autonomous Agent</text>
+
+  <text x="1425" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#0369A1">24/7 Independent Bot</text>
+
+  <!-- Triggers -->
+  <rect x="1320" y="225" width="55" height="22" rx="4" fill="#FEE2E2"/>
+  <text x="1347" y="240" text-anchor="middle" font-size="7" fill="#991B1B">Cron</text>
+
+  <rect x="1380" y="225" width="55" height="22" rx="4" fill="#FEF3C7"/>
+  <text x="1407" y="240" text-anchor="middle" font-size="7" fill="#92400E">Hook</text>
+
+  <rect x="1440" y="225" width="55" height="22" rx="4" fill="#DBEAFE"/>
+  <text x="1467" y="240" text-anchor="middle" font-size="7" fill="#1E40AF">Slack</text>
+
+  <path d="M1347 247 L1347 260 L1425 260" stroke="#9CA3AF" stroke-width="1"/>
+  <path d="M1407 247 L1407 260" stroke="#9CA3AF" stroke-width="1"/>
+  <path d="M1467 247 L1467 260 L1425 260" stroke="#9CA3AF" stroke-width="1"/>
+  <path d="M1425 260 L1425 275" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="1320" y="280" width="210" height="40" rx="6" fill="#F0F9FF" stroke="#0EA5E9"/>
+  <text x="1425" y="300" text-anchor="middle" font-size="9" font-weight="600" fill="#0369A1">Agent Orchestrator</text>
+  <text x="1425" y="313" text-anchor="middle" font-size="7" fill="#0C4A6E">Claude API + Agent SDK</text>
+
+  <path d="M1425 320 L1425 335" stroke="#0EA5E9" stroke-width="1.5" marker-end="url(#arr-cyan-sm)"/>
+
+  <rect x="1320" y="340" width="210" height="30" rx="6" fill="#FCE7F3" stroke="#EC4899"/>
+  <text x="1425" y="360" text-anchor="middle" font-size="9" fill="#9D174D">Loads Plugin</text>
+
+  <path d="M1425 370 L1425 385" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-sm)"/>
+
+  <rect x="1320" y="390" width="210" height="25" rx="4" fill="#FEF3C7"/>
+  <text x="1425" y="407" text-anchor="middle" font-size="8" fill="#92400E">Human-in-the-Loop</text>
+
+  <rect x="1320" y="440" width="210" height="70" rx="8" fill="#F0F9FF"/>
+  <text x="1425" y="460" text-anchor="middle" font-size="9" font-weight="600" fill="#0369A1">Capabilities:</text>
+  <text x="1425" y="478" text-anchor="middle" font-size="8" fill="#0369A1">24/7 autonomous operation</text>
+  <text x="1425" y="493" text-anchor="middle" font-size="8" fill="#0369A1">Self-healing + error recovery</text>
+  <text x="1425" y="508" text-anchor="middle" font-size="8" fill="#0369A1">Multi-channel I/O</text>
+
+  <rect x="1320" y="520" width="210" height="35" rx="8" fill="#0EA5E9"/>
+  <text x="1425" y="543" text-anchor="middle" font-size="10" font-weight="600" fill="white">Auto Everything</text>
+
+  <!-- Bottom Evolution Arrow -->
+  <path d="M100 650 L1500 650" stroke="#E2E8F0" stroke-width="3"/>
+  <path d="M1480 640 L1500 650 L1480 660" fill="#E2E8F0"/>
+
+  <text x="800" y="690" text-anchor="middle" font-size="16" font-weight="600" fill="#64748B">Increasing Autonomy + Intelligence</text>
+  <text x="180" y="720" text-anchor="middle" font-size="11" fill="#94A3B8">Rule-Based + Human Synthesis</text>
+  <text x="1420" y="720" text-anchor="middle" font-size="11" fill="#94A3B8">Autonomous + Human Oversight</text>
+
+</svg>

@@ -25,6 +25,7 @@ import {
   updateWatchlistItem,
 } from './lib/firestore';
 import { toast } from 'sonner';
+import { getErrorMessage } from './lib/utils';
 
 const REPORT_BATCH_LIMIT = 5;
 
@@ -138,7 +139,7 @@ const App: React.FC = () => {
       await updateSource(user.uid, id, { active: !source.active });
     } catch (error) {
       console.error('Failed to toggle source:', error);
-      toast.error('Failed to update source. Please try again.');
+      toast.error(`Failed to update source: ${getErrorMessage(error)}`);
     }
   };
 
@@ -212,9 +213,9 @@ const App: React.FC = () => {
         if (runTokenRef.current !== runToken) break;
         try {
           await createReport(item.id);
-        } catch (error: any) {
+        } catch (error) {
           console.error("Failed to create report", error);
-          alert(error?.message || "Failed to create report");
+          toast.error(`Failed to create report: ${getErrorMessage(error)}`);
         }
       }
     } finally {
@@ -268,7 +269,7 @@ const App: React.FC = () => {
                   toast.success('Watchlist item added');
                 } catch (error) {
                   console.error('Failed to add watchlist item:', error);
-                  toast.error('Failed to add item. Please try again.');
+                  toast.error(`Failed to add item: ${getErrorMessage(error)}`);
                   throw error;
                 }
               }}
@@ -278,7 +279,7 @@ const App: React.FC = () => {
                   await updateWatchlistItem(user.uid, id, updates);
                 } catch (error) {
                   console.error('Failed to update watchlist item:', error);
-                  toast.error('Failed to update item. Please try again.');
+                  toast.error(`Failed to update item: ${getErrorMessage(error)}`);
                 }
               }}
               onDelete={async (id) => {
@@ -288,7 +289,7 @@ const App: React.FC = () => {
                   toast.success('Watchlist item deleted');
                 } catch (error) {
                   console.error('Failed to delete watchlist item:', error);
-                  toast.error('Failed to delete item. Please try again.');
+                  toast.error(`Failed to delete item: ${getErrorMessage(error)}`);
                 }
               }}
             />
@@ -305,7 +306,7 @@ const App: React.FC = () => {
                   toast.success('Media source added');
                 } catch (error) {
                   console.error('Failed to add source:', error);
-                  toast.error('Failed to add source. Please try again.');
+                  toast.error(`Failed to add source: ${getErrorMessage(error)}`);
                   throw error;
                 }
               }}
@@ -316,7 +317,7 @@ const App: React.FC = () => {
                   toast.success('Media source deleted');
                 } catch (error) {
                   console.error('Failed to delete source:', error);
-                  toast.error('Failed to delete source. Please try again.');
+                  toast.error(`Failed to delete source: ${getErrorMessage(error)}`);
                 }
               }}
             />

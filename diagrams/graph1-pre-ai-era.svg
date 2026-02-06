@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 950" font-family="Inter, system-ui, sans-serif">
+  <!-- Background -->
+  <rect width="850" height="950" fill="#FAFAFA"/>
+
+  <!-- Title -->
+  <text x="425" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#1a1a1a">Graph 1: Pre-GenAI Software</text>
+  <text x="425" y="65" text-anchor="middle" font-size="14" fill="#666">Traditional Media Monitoring Architecture (RSS + Keywords + ML Classifiers)</text>
+
+  <!-- Era Badge -->
+  <rect x="320" y="80" width="210" height="28" rx="14" fill="#6B7280"/>
+  <text x="425" y="99" text-anchor="middle" font-size="12" font-weight="600" fill="white">2010-2022 Era</text>
+
+  <!-- DATA SOURCES -->
+  <text x="425" y="135" text-anchor="middle" font-size="12" font-weight="600" fill="#4B5563">DATA SOURCES</text>
+
+  <rect x="80" y="150" width="120" height="50" rx="8" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="140" y="172" text-anchor="middle" font-size="10" font-weight="600" fill="#1E40AF">RSS Feeds</text>
+  <text x="140" y="188" text-anchor="middle" font-size="8" fill="#3B82F6">Structured XML</text>
+
+  <rect x="220" y="150" width="120" height="50" rx="8" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="280" y="172" text-anchor="middle" font-size="10" font-weight="600" fill="#1E40AF">News APIs</text>
+  <text x="280" y="188" text-anchor="middle" font-size="8" fill="#3B82F6">JSON endpoints</text>
+
+  <rect x="360" y="150" width="120" height="50" rx="8" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="420" y="172" text-anchor="middle" font-size="10" font-weight="600" fill="#1E40AF">Web Scrapers</text>
+  <text x="420" y="188" text-anchor="middle" font-size="8" fill="#3B82F6">HTML parsing</text>
+
+  <rect x="500" y="150" width="120" height="50" rx="8" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="560" y="172" text-anchor="middle" font-size="10" font-weight="600" fill="#1E40AF">Social APIs</text>
+  <text x="560" y="188" text-anchor="middle" font-size="8" fill="#3B82F6">Twitter, etc.</text>
+
+  <rect x="640" y="150" width="120" height="50" rx="8" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="700" y="172" text-anchor="middle" font-size="10" font-weight="600" fill="#1E40AF">Email Alerts</text>
+  <text x="700" y="188" text-anchor="middle" font-size="8" fill="#3B82F6">Google Alerts</text>
+
+  <!-- Arrows down -->
+  <path d="M140 200 L140 220 L425 220" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M280 200 L280 220 L425 220" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M420 200 L420 220" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M560 200 L560 220 L425 220" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M700 200 L700 220 L425 220" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M425 220 L425 245" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow1)"/>
+
+  <!-- INGESTION LAYER -->
+  <rect x="175" y="255" width="500" height="70" rx="12" fill="white" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="175" y="255" width="500" height="28" rx="12" fill="#F1F5F9"/>
+  <text x="195" y="274" font-size="11" font-weight="600" fill="#64748B">INGESTION LAYER</text>
+  <text x="425" y="300" text-anchor="middle" font-size="11" fill="#4B5563">Scheduled Jobs (Cron) | Rate Limiting | Deduplication | Normalization</text>
+
+  <path d="M425 325 L425 355" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow1)"/>
+
+  <!-- KEYWORD FILTERING - The Key Limitation -->
+  <rect x="175" y="365" width="500" height="100" rx="12" fill="white" stroke="#F59E0B" stroke-width="3"/>
+  <rect x="175" y="365" width="500" height="28" rx="12" fill="#FEF3C7"/>
+  <text x="195" y="384" font-size="11" font-weight="600" fill="#92400E">KEYWORD + RULE ENGINE</text>
+  <text x="645" y="384" text-anchor="end" font-size="10" fill="#F59E0B">! Core Limitation</text>
+
+  <rect x="195" y="405" width="150" height="45" rx="6" fill="#FEF3C7"/>
+  <text x="270" y="425" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">Boolean Queries</text>
+  <text x="270" y="440" text-anchor="middle" font-size="8" fill="#92400E">"Iran" AND "nuclear"</text>
+
+  <rect x="355" y="405" width="150" height="45" rx="6" fill="#FEF3C7"/>
+  <text x="430" y="425" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">Regex Patterns</text>
+  <text x="430" y="440" text-anchor="middle" font-size="8" fill="#92400E">/sanction[s]?/gi</text>
+
+  <rect x="515" y="405" width="150" height="45" rx="6" fill="#FEF3C7"/>
+  <text x="590" y="425" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">Inclusion/Exclusion</text>
+  <text x="590" y="440" text-anchor="middle" font-size="8" fill="#92400E">Whitelists, Blacklists</text>
+
+  <path d="M425 465 L425 495" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow1)"/>
+
+  <!-- ML CLASSIFIERS (Pre-GenAI ML) -->
+  <rect x="175" y="505" width="500" height="90" rx="12" fill="white" stroke="#8B5CF6" stroke-width="2"/>
+  <rect x="175" y="505" width="500" height="28" rx="12" fill="#F5F3FF"/>
+  <text x="195" y="524" font-size="11" font-weight="600" fill="#5B21B6">ML CLASSIFIERS (Pre-trained, Task-Specific)</text>
+
+  <rect x="195" y="545" width="110" height="40" rx="6" fill="#F5F3FF"/>
+  <text x="250" y="562" text-anchor="middle" font-size="8" font-weight="600" fill="#5B21B6">Sentiment</text>
+  <text x="250" y="575" text-anchor="middle" font-size="7" fill="#7C3AED">+/-/neutral</text>
+
+  <rect x="315" y="545" width="110" height="40" rx="6" fill="#F5F3FF"/>
+  <text x="370" y="562" text-anchor="middle" font-size="8" font-weight="600" fill="#5B21B6">Topic Tags</text>
+  <text x="370" y="575" text-anchor="middle" font-size="7" fill="#7C3AED">Fixed categories</text>
+
+  <rect x="435" y="545" width="110" height="40" rx="6" fill="#F5F3FF"/>
+  <text x="490" y="562" text-anchor="middle" font-size="8" font-weight="600" fill="#5B21B6">Language</text>
+  <text x="490" y="575" text-anchor="middle" font-size="7" fill="#7C3AED">Detection only</text>
+
+  <rect x="555" y="545" width="110" height="40" rx="6" fill="#F5F3FF"/>
+  <text x="610" y="562" text-anchor="middle" font-size="8" font-weight="600" fill="#5B21B6">NER</text>
+  <text x="610" y="575" text-anchor="middle" font-size="7" fill="#7C3AED">Entity extraction</text>
+
+  <path d="M425 595 L425 625" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow1)"/>
+
+  <!-- DATABASE -->
+  <rect x="275" y="635" width="300" height="50" rx="8" fill="#E5E7EB" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="425" y="660" text-anchor="middle" font-size="11" font-weight="600" fill="#4B5563">SQL/NoSQL Database</text>
+  <text x="425" y="675" text-anchor="middle" font-size="9" fill="#6B7280">Structured storage | Full-text search index</text>
+
+  <path d="M425 685 L425 715" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow1)"/>
+
+  <!-- OUTPUT LAYER -->
+  <rect x="175" y="725" width="500" height="80" rx="12" fill="white" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="175" y="725" width="500" height="28" rx="12" fill="#F1F5F9"/>
+  <text x="195" y="744" font-size="11" font-weight="600" fill="#64748B">OUTPUT LAYER</text>
+
+  <rect x="195" y="760" width="100" height="35" rx="6" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="245" y="782" text-anchor="middle" font-size="9" fill="#065F46">Dashboard</text>
+
+  <rect x="305" y="760" width="100" height="35" rx="6" fill="#DBEAFE" stroke="#3B82F6"/>
+  <text x="355" y="782" text-anchor="middle" font-size="9" fill="#1E40AF">Email Alerts</text>
+
+  <rect x="415" y="760" width="100" height="35" rx="6" fill="#FEF3C7" stroke="#F59E0B"/>
+  <text x="465" y="782" text-anchor="middle" font-size="9" fill="#92400E">CSV Export</text>
+
+  <rect x="525" y="760" width="140" height="35" rx="6" fill="#FCE7F3" stroke="#EC4899"/>
+  <text x="595" y="782" text-anchor="middle" font-size="9" fill="#9D174D">API Endpoints</text>
+
+  <path d="M425 805 L425 835" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow1)"/>
+
+  <!-- HUMAN ANALYST -->
+  <rect x="275" y="845" width="300" height="50" rx="25" fill="#6B7280" stroke="#4B5563" stroke-width="2"/>
+  <text x="425" y="877" text-anchor="middle" font-size="13" font-weight="600" fill="white">Human Analyst Reviews + Writes Report</text>
+
+  <!-- LIMITATIONS BOX -->
+  <rect x="700" y="365" width="140" height="230" rx="8" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+  <text x="770" y="390" text-anchor="middle" font-size="11" font-weight="600" fill="#DC2626">Limitations</text>
+  <line x1="715" y1="400" x2="825" y2="400" stroke="#FECACA" stroke-width="1"/>
+  <text x="770" y="420" text-anchor="middle" font-size="9" fill="#7F1D1D">Keyword brittleness</text>
+  <text x="770" y="440" text-anchor="middle" font-size="9" fill="#7F1D1D">No semantic search</text>
+  <text x="770" y="460" text-anchor="middle" font-size="9" fill="#7F1D1D">Fixed categories</text>
+  <text x="770" y="480" text-anchor="middle" font-size="9" fill="#7F1D1D">No summarization</text>
+  <text x="770" y="500" text-anchor="middle" font-size="9" fill="#7F1D1D">No translation</text>
+  <text x="770" y="520" text-anchor="middle" font-size="9" fill="#7F1D1D">No reasoning</text>
+  <text x="770" y="540" text-anchor="middle" font-size="9" fill="#7F1D1D">Manual synthesis</text>
+  <text x="770" y="560" text-anchor="middle" font-size="9" fill="#7F1D1D">Rule maintenance</text>
+  <text x="770" y="580" text-anchor="middle" font-size="9" fill="#7F1D1D">Language barriers</text>
+
+  <!-- WHAT SOFTWARE COULD DO vs COULDN'T DO -->
+  <rect x="10" y="365" width="140" height="130" rx="8" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1"/>
+  <text x="80" y="390" text-anchor="middle" font-size="11" font-weight="600" fill="#065F46">Could Do</text>
+  <line x1="25" y1="400" x2="135" y2="400" stroke="#A7F3D0" stroke-width="1"/>
+  <text x="80" y="420" text-anchor="middle" font-size="9" fill="#065F46">Aggregate feeds</text>
+  <text x="80" y="440" text-anchor="middle" font-size="9" fill="#065F46">Keyword matching</text>
+  <text x="80" y="460" text-anchor="middle" font-size="9" fill="#065F46">Basic classification</text>
+  <text x="80" y="480" text-anchor="middle" font-size="9" fill="#065F46">Alert on triggers</text>
+
+  <rect x="10" y="505" width="140" height="130" rx="8" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+  <text x="80" y="530" text-anchor="middle" font-size="11" font-weight="600" fill="#DC2626">Could NOT Do</text>
+  <line x1="25" y1="540" x2="135" y2="540" stroke="#FECACA" stroke-width="1"/>
+  <text x="80" y="560" text-anchor="middle" font-size="9" fill="#7F1D1D">Understand intent</text>
+  <text x="80" y="580" text-anchor="middle" font-size="9" fill="#7F1D1D">Generate content</text>
+  <text x="80" y="600" text-anchor="middle" font-size="9" fill="#7F1D1D">Reason about data</text>
+  <text x="80" y="620" text-anchor="middle" font-size="9" fill="#7F1D1D">Translate context</text>
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arrow1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+</svg>

@@ -1,11 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { WatchlistItem } from '../types';
 import { Plus, Trash2, Edit2, X, Save, Calendar, Clock } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Card, CardContent, CardHeader } from './ui/card';
-import { Badge } from './ui/badge';
-import { cn } from '../lib/utils';
 
 interface WatchlistProps {
   watchlist: WatchlistItem[];
@@ -15,7 +10,7 @@ interface WatchlistProps {
   onDelete: (id: string) => Promise<void>;
 }
 
-const Watchlist = ({ watchlist, loading, onAdd, onUpdate, onDelete }: WatchlistProps) => {
+const Watchlist: React.FC<WatchlistProps> = ({ watchlist, loading, onAdd, onUpdate, onDelete }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newTopic, setNewTopic] = useState('');
   const [newDesc, setNewDesc] = useState('');
@@ -32,24 +27,23 @@ const Watchlist = ({ watchlist, loading, onAdd, onUpdate, onDelete }: WatchlistP
 
   const handleAdd = async () => {
     if (!newTopic.trim()) return;
-    try {
-      await onAdd({
-        topic: newTopic,
-        description: newDesc,
-        timeRange: newTimeRange,
-        customStartDate: newTimeRange === 'custom' ? newStartDate : undefined,
-        customEndDate: newTimeRange === 'custom' ? newEndDate : undefined
-      });
-      // Only clear form on success
-      setNewTopic('');
-      setNewDesc('');
-      setNewTimeRange('last7d');
-      setNewStartDate('');
-      setNewEndDate('');
-      setIsAdding(false);
-    } catch {
-      // Error already handled by parent (toast shown), just preserve form state
-    }
+    const newItem: Omit<WatchlistItem, 'id'> = {
+      topic: newTopic,
+      description: newDesc,
+      timeRange: newTimeRange,
+      ...(newTimeRange === 'custom' && { customStartDate: newStartDate, customEndDate: newEndDate }),
+    };
+    await onAdd(newItem);
+    setNewTopic('');
+    setNewDesc('');
+    setNewTimeRange('last7d');
+    setNewStartDate('');
+    setNewEndDate('');
+    setIsAdding(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    await onDelete(id);
   };
 
   const startEdit = (item: WatchlistItem) => {
@@ -74,135 +68,116 @@ const Watchlist = ({ watchlist, loading, onAdd, onUpdate, onDelete }: WatchlistP
     if (!editingId) return;
     const original = watchlist.find((w) => w.id === editingId);
     const nextTopic = editTopic.trim() || original?.topic || editTopic;
-    try {
-      await onUpdate(editingId, {
-        topic: nextTopic,
-        description: editDesc,
-        timeRange: editTimeRange,
-        customStartDate: editTimeRange === 'custom' ? editStartDate : undefined,
-        customEndDate: editTimeRange === 'custom' ? editEndDate : undefined,
-      });
-      // Only exit edit mode on success
-      cancelEdit();
-    } catch {
-      // Error already handled by parent (toast shown), keep edit mode open
-    }
+    await onUpdate(editingId, {
+      topic: nextTopic,
+      description: editDesc,
+      timeRange: editTimeRange,
+      ...(editTimeRange === 'custom' && { customStartDate: editStartDate, customEndDate: editEndDate }),
+    });
+    cancelEdit();
   };
 
-  const TimeRangeButton = ({
-    value,
-    current,
-    onClick,
-    children
-  }: {
-    value: string;
-    current: string;
-    onClick: () => void;
-    children: React.ReactNode;
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-        value === current
-          ? "bg-accent text-accent-foreground shadow-sm"
-          : "bg-muted text-muted-foreground hover:bg-muted/80"
-      )}
-    >
-      {children}
-    </button>
-  );
-
   return (
-    <div className="max-w-4xl mx-auto pb-12">
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10 pb-6 border-b border-border">
+    <div className="max-w-4xl mx-auto">
+      <div className="flex justify-between items-end mb-10 pb-6 border-b border-gray-200">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Intelligence Watchlist</h1>
-          <p className="text-muted-foreground">Define topics for the engine to monitor, translate, and analyze.</p>
+          <h2 className="text-3xl font-bold font-serif text-gray-900 mb-2">Intelligence Watchlist</h2>
+          <p className="text-gray-600">Define topics for the engine to monitor, translate, and analyze.</p>
         </div>
-        <Button
+        <button 
           onClick={() => setIsAdding(true)}
-          className="bg-accent hover:bg-accent-hover text-accent-foreground shadow-glow"
+          className="flex items-center space-x-2 bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm"
         >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Objective
-        </Button>
+          <Plus size={18} />
+          <span>Add Objective</span>
+        </button>
       </div>
 
       {isAdding && (
-        <Card className="mb-8 animate-in border-accent/20">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <h3 className="font-bold text-foreground text-lg">New Monitoring Objective</h3>
-            <Button variant="ghost" size="icon" onClick={() => setIsAdding(false)}>
-              <X className="w-5 h-5" />
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-5">
+        <div className="mb-8 bg-white border border-gray-200 rounded-xl p-8 shadow-sm animate-in fade-in slide-in-from-top-2">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-gray-900 text-lg font-serif">New Monitoring Objective</h3>
+            <button onClick={() => setIsAdding(false)} className="text-gray-400 hover:text-gray-600">
+              <X size={20} />
+            </button>
+          </div>
+          <div className="space-y-5">
             <div>
-              <label className="block text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wider">
-                Topic (English)
-              </label>
-              <Input
+              <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Topic (English)</label>
+              <input 
                 value={newTopic}
                 onChange={(e) => setNewTopic(e.target.value)}
+                className="w-full bg-surface-secondary border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
                 placeholder="e.g. Internet Censorship Bill"
-                className="bg-muted/50"
               />
             </div>
-
             <div>
-              <label className="block text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wider">
-                Context / Description
-              </label>
-              <Input
+              <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Context / Description</label>
+              <input 
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
+                className="w-full bg-surface-secondary border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
                 placeholder="Brief context for the analyst..."
-                className="bg-muted/50"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wider">
-                Monitoring Period
-              </label>
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <TimeRangeButton value="last24h" current={newTimeRange} onClick={() => setNewTimeRange('last24h')}>
-                  <Clock className="w-4 h-4" />
-                  24 Hours
-                </TimeRangeButton>
-                <TimeRangeButton value="last7d" current={newTimeRange} onClick={() => setNewTimeRange('last7d')}>
-                  <Clock className="w-4 h-4" />
-                  7 Days
-                </TimeRangeButton>
-                <TimeRangeButton value="last30d" current={newTimeRange} onClick={() => setNewTimeRange('last30d')}>
-                  <Clock className="w-4 h-4" />
-                  30 Days
-                </TimeRangeButton>
-                <TimeRangeButton value="custom" current={newTimeRange} onClick={() => setNewTimeRange('custom')}>
-                  <Calendar className="w-4 h-4" />
-                  Custom
-                </TimeRangeButton>
+              <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Monitoring Period</label>
+              <div className="flex items-center space-x-3 mb-3">
+                <button
+                  onClick={() => setNewTimeRange('last24h')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    newTimeRange === 'last24h'
+                      ? 'bg-accent text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Clock size={16} />
+                  <span>24 Hours</span>
+                </button>
+                <button
+                  onClick={() => setNewTimeRange('last7d')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    newTimeRange === 'last7d'
+                      ? 'bg-accent text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Clock size={16} />
+                  <span>7 Days</span>
+                </button>
+                <button
+                  onClick={() => setNewTimeRange('custom')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    newTimeRange === 'custom'
+                      ? 'bg-accent text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <Calendar size={16} />
+                  <span>Custom Range</span>
+                </button>
               </div>
 
               {newTimeRange === 'custom' && (
-                <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg animate-in">
+                <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-100 animate-in fade-in">
                   <div className="flex-1">
-                    <label className="block text-xs text-muted-foreground mb-1">Start Date</label>
-                    <Input
+                    <label className="block text-xs text-gray-500 mb-1">Start Date</label>
+                    <input
                       type="date"
                       value={newStartDate}
                       onChange={(e) => setNewStartDate(e.target.value)}
+                      className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-accent"
                     />
                   </div>
-                  <div className="text-muted-foreground mt-5">→</div>
+                  <div className="text-gray-400 mt-5">→</div>
                   <div className="flex-1">
-                    <label className="block text-xs text-muted-foreground mb-1">End Date</label>
-                    <Input
+                    <label className="block text-xs text-gray-500 mb-1">End Date</label>
+                    <input
                       type="date"
                       value={newEndDate}
                       onChange={(e) => setNewEndDate(e.target.value)}
+                      className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-accent"
                     />
                   </div>
                 </div>
@@ -210,172 +185,169 @@ const Watchlist = ({ watchlist, loading, onAdd, onUpdate, onDelete }: WatchlistP
             </div>
 
             <div className="flex justify-end pt-4">
-              <Button onClick={handleAdd} className="bg-primary hover:bg-primary/90">
-                <Save className="w-4 h-4 mr-2" />
-                Save to Watchlist
-              </Button>
+              <button 
+                onClick={handleAdd}
+                className="flex items-center space-x-2 bg-gray-900 hover:bg-black text-white px-6 py-2.5 rounded-lg transition-colors font-medium"
+              >
+                <Save size={16} />
+                <span>Save to Watchlist</span>
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       <div className="space-y-4">
-        {loading && watchlist.length === 0 && (
-          <>
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="py-6">
-                  <div className="h-4 bg-muted rounded w-1/3 mb-3" />
-                  <div className="h-3 bg-muted/50 rounded w-2/3 mb-2" />
-                  <div className="h-3 bg-muted/50 rounded w-1/2" />
-                </CardContent>
-              </Card>
-            ))}
-          </>
+        {loading && (
+          <div className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
+            <div className="h-3 bg-gray-100 rounded w-2/3 mb-2" />
+            <div className="h-3 bg-gray-100 rounded w-1/2" />
+          </div>
         )}
         {watchlist.map((item) => (
-          <Card key={item.id} className="hover:border-accent/30 hover:shadow-sm transition-all group">
-            <CardContent className="py-5">
-              {editingId === item.id ? (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-bold text-foreground">Edit Objective</h3>
-                    <Button variant="ghost" size="icon" onClick={cancelEdit}>
-                      <X className="w-4 h-4" />
-                    </Button>
+          <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-5 hover:border-accent/30 hover:shadow-sm transition-all">
+            {editingId === item.id ? (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-bold text-gray-900 font-serif">Edit Objective</h3>
+                  <button onClick={cancelEdit} className="text-gray-400 hover:text-gray-600">
+                    <X size={18} />
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">Topic</label>
+                    <input
+                      value={editTopic}
+                      onChange={(e) => setEditTopic(e.target.value)}
+                      className="w-full bg-surface-secondary border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-accent"
+                    />
                   </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wider">
-                        Topic
-                      </label>
-                      <Input
-                        value={editTopic}
-                        onChange={(e) => setEditTopic(e.target.value)}
-                        className="bg-muted/50"
-                      />
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">Context</label>
+                    <input
+                      value={editDesc}
+                      onChange={(e) => setEditDesc(e.target.value)}
+                      className="w-full bg-surface-secondary border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Monitoring Period</label>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <button
+                        onClick={() => setEditTimeRange('last24h')}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          editTimeRange === 'last24h' ? 'bg-accent text-white' : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        24 Hours
+                      </button>
+                      <button
+                        onClick={() => setEditTimeRange('last7d')}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          editTimeRange === 'last7d' ? 'bg-accent text-white' : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        7 Days
+                      </button>
+                      <button
+                        onClick={() => setEditTimeRange('custom')}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                          editTimeRange === 'custom' ? 'bg-accent text-white' : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        Custom Range
+                      </button>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wider">
-                        Context
-                      </label>
-                      <Input
-                        value={editDesc}
-                        onChange={(e) => setEditDesc(e.target.value)}
-                        className="bg-muted/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wider">
-                        Period
-                      </label>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {(['last24h', 'last7d', 'last30d', 'custom'] as const).map((range) => (
-                          <button
-                            key={range}
-                            type="button"
-                            onClick={() => setEditTimeRange(range)}
-                            className={cn(
-                              "px-3 py-1.5 rounded-md text-xs font-medium transition-all",
-                              editTimeRange === range
-                                ? "bg-accent text-accent-foreground"
-                                : "bg-muted text-muted-foreground hover:bg-muted/80"
-                            )}
-                          >
-                            {range === 'last24h' ? '24h' : range === 'last7d' ? '7 Days' : range === 'last30d' ? '30 Days' : 'Custom'}
-                          </button>
-                        ))}
+                    {editTimeRange === 'custom' && (
+                      <div className="flex gap-3 p-3 bg-gray-50 rounded-md border border-gray-100">
+                        <input
+                          type="date"
+                          value={editStartDate}
+                          onChange={(e) => setEditStartDate(e.target.value)}
+                          className="w-full bg-white border border-gray-200 rounded px-2 py-1 text-xs"
+                        />
+                        <span className="text-gray-400 self-center">→</span>
+                        <input
+                          type="date"
+                          value={editEndDate}
+                          onChange={(e) => setEditEndDate(e.target.value)}
+                          className="w-full bg-white border border-gray-200 rounded px-2 py-1 text-xs"
+                        />
                       </div>
-                      {editTimeRange === 'custom' && (
-                        <div className="flex gap-3 p-3 bg-muted/50 rounded-lg">
-                          <Input
-                            type="date"
-                            value={editStartDate}
-                            onChange={(e) => setEditStartDate(e.target.value)}
-                          />
-                          <span className="text-muted-foreground self-center">→</span>
-                          <Input
-                            type="date"
-                            value={editEndDate}
-                            onChange={(e) => setEditEndDate(e.target.value)}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-3 pt-2">
-                    <Button variant="ghost" onClick={cancelEdit}>Cancel</Button>
-                    <Button onClick={saveEdit} className="bg-accent hover:bg-accent-hover text-accent-foreground">
-                      <Save className="w-4 h-4 mr-2" />
-                      Save Changes
-                    </Button>
+                    )}
                   </div>
                 </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <div className="space-y-2">
-                    <h3 className="font-bold text-foreground text-lg">{item.topic}</h3>
-                    <p className="text-muted-foreground text-sm">{item.description}</p>
-                    <Badge variant="outline" className="text-xs">
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    onClick={cancelEdit}
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors text-sm font-medium"
+                  >
+                    <span>Cancel</span>
+                  </button>
+                  <button
+                    onClick={saveEdit}
+                    className="flex items-center space-x-2 bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <Save size={16} />
+                    <span>Save Changes</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between group">
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg font-serif mb-1">{item.topic}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed mb-2">{item.description}</p>
+                  <div className="flex items-center space-x-2">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
                       {item.timeRange === 'custom' ? (
                         <>
-                          <Calendar className="w-3 h-3 mr-1" />
+                          <Calendar size={10} className="mr-1" />
                           {item.customStartDate} to {item.customEndDate}
                         </>
-                      ) : item.timeRange === 'last30d' ? (
+                      ) : item.timeRange === 'last7d' ? (
                         <>
-                          <Clock className="w-3 h-3 mr-1" />
-                          Last 30 days
-                        </>
-                      ) : item.timeRange === 'last24h' ? (
-                        <>
-                          <Clock className="w-3 h-3 mr-1" />
-                          Last 24h
+                          <Clock size={10} className="mr-1" />
+                          Last 7 days
                         </>
                       ) : (
                         <>
-                          <Clock className="w-3 h-3 mr-1" />
-                          Last 7 days
+                          <Clock size={10} className="mr-1" />
+                          Last 24h
                         </>
                       )}
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => startEdit(item)}
-                      className="text-muted-foreground hover:text-accent"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDelete(item.id)}
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    </span>
                   </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => startEdit(item)}
+                    className="p-2 text-gray-400 hover:text-accent hover:bg-accent-light rounded-md transition-colors"
+                    aria-label="Edit objective"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(item.id)}
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                    aria-label="Delete objective"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         ))}
-
-        {watchlist.length === 0 && !loading && (
-          <Card className="border-dashed border-2">
-            <CardContent className="py-16 text-center">
-              <p className="text-muted-foreground font-medium">No active monitoring objectives.</p>
-              <Button variant="link" onClick={() => setIsAdding(true)} className="text-accent mt-2">
-                Add your first topic
-              </Button>
-            </CardContent>
-          </Card>
+        {watchlist.length === 0 && (
+          <div className="text-center py-16 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+            <p className="text-gray-500 font-medium">No active monitoring objectives.</p>
+            <button onClick={() => setIsAdding(true)} className="text-accent hover:underline text-sm mt-2">
+              Add your first topic
+            </button>
+          </div>
         )}
       </div>
     </div>

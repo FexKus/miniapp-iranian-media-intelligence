@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" font-family="Inter, system-ui, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="900" fill="#FAFAFA"/>
+
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#1a1a1a">Graph 6: Independent AI Agent</text>
+  <text x="450" y="65" text-anchor="middle" font-size="14" fill="#666">Autonomous Bot Using the Plugin (e.g., OpenClaw)</text>
+
+  <!-- Era Badge -->
+  <rect x="325" y="80" width="250" height="28" rx="14" fill="#0EA5E9"/>
+  <text x="450" y="99" text-anchor="middle" font-size="12" font-weight="600" fill="white">🤖 Autonomous Agent Architecture</text>
+
+  <!-- External Triggers (Top) -->
+  <rect x="100" y="130" width="150" height="50" rx="8" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+  <text x="175" y="150" text-anchor="middle" font-size="10" font-weight="600" fill="#991B1B">⏰ Schedule</text>
+  <text x="175" y="168" text-anchor="middle" font-size="9" fill="#7F1D1D">"Every 6 hours"</text>
+
+  <rect x="280" y="130" width="150" height="50" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="355" y="150" text-anchor="middle" font-size="10" font-weight="600" fill="#92400E">📡 Webhook</text>
+  <text x="355" y="168" text-anchor="middle" font-size="9" fill="#92400E">"News alert"</text>
+
+  <rect x="460" y="130" width="150" height="50" rx="8" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  <text x="535" y="150" text-anchor="middle" font-size="10" font-weight="600" fill="#1E40AF">💬 Slack</text>
+  <text x="535" y="168" text-anchor="middle" font-size="9" fill="#1E40AF">"@bot analyze X"</text>
+
+  <rect x="640" y="130" width="150" height="50" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
+  <text x="715" y="150" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46">📧 Email</text>
+  <text x="715" y="168" text-anchor="middle" font-size="9" fill="#065F46">"Forward to bot"</text>
+
+  <!-- Arrows from triggers -->
+  <path d="M175 180 L175 210 L450 210 L450 240" stroke="#94A3B8" stroke-width="2"/>
+  <path d="M355 180 L355 210 L450 210" stroke="#94A3B8" stroke-width="2"/>
+  <path d="M535 180 L535 210 L450 210" stroke="#94A3B8" stroke-width="2"/>
+  <path d="M715 180 L715 210 L450 210" stroke="#94A3B8" stroke-width="2"/>
+  <circle cx="450" cy="210" r="4" fill="#94A3B8"/>
+  <path d="M450 210 L450 240" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow6)"/>
+
+  <!-- BOT CONTAINER -->
+  <rect x="150" y="250" width="600" height="520" rx="20" fill="white" stroke="#0EA5E9" stroke-width="3"/>
+
+  <!-- Bot Header -->
+  <rect x="150" y="250" width="600" height="60" rx="20" fill="#0EA5E9"/>
+  <text x="200" y="275" font-size="24">🤖</text>
+  <text x="240" y="285" font-size="18" font-weight="700" fill="white">MediaIntel Bot</text>
+  <text x="710" y="285" text-anchor="end" font-size="11" fill="#BAE6FD">Autonomous • 24/7</text>
+
+  <!-- Bot Brain/Orchestrator -->
+  <rect x="170" y="330" width="560" height="80" rx="12" fill="#F0F9FF" stroke="#0EA5E9" stroke-width="2"/>
+  <text x="450" y="355" text-anchor="middle" font-size="14" font-weight="600" fill="#0369A1">🧠 Agent Orchestrator (Claude API + Agent SDK)</text>
+  <text x="450" y="380" text-anchor="middle" font-size="11" fill="#0C4A6E">Autonomous decision-making • Task planning • Error recovery</text>
+  <text x="450" y="398" text-anchor="middle" font-size="10" fill="#6B7280">Memory: Conversation history • State: Persistent • Goals: User-defined</text>
+
+  <!-- Arrow -->
+  <path d="M450 410 L450 440" stroke="#0EA5E9" stroke-width="2" marker-end="url(#arrow-cyan)"/>
+  <text x="470" y="430" font-size="10" fill="#0EA5E9">loads plugin</text>
+
+  <!-- Plugin (Simplified) -->
+  <rect x="200" y="450" width="500" height="140" rx="12" fill="#FCE7F3" stroke="#EC4899" stroke-width="2"/>
+  <rect x="200" y="450" width="500" height="35" rx="12" fill="#EC4899"/>
+  <text x="450" y="473" text-anchor="middle" font-size="12" font-weight="600" fill="white">🧩 Intelligence Analysis Plugin</text>
+
+  <!-- Skills within plugin -->
+  <rect x="220" y="500" width="110" height="35" rx="6" fill="#F5F3FF" stroke="#8B5CF6"/>
+  <text x="275" y="522" text-anchor="middle" font-size="9" font-weight="600" fill="#5B21B6">📡 monitor</text>
+
+  <rect x="340" y="500" width="110" height="35" rx="6" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="395" y="522" text-anchor="middle" font-size="9" font-weight="600" fill="#065F46">📄 report</text>
+
+  <rect x="460" y="500" width="110" height="35" rx="6" fill="#FEF3C7" stroke="#F59E0B"/>
+  <text x="515" y="522" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">📤 distribute</text>
+
+  <rect x="580" y="500" width="100" height="35" rx="6" fill="#FEE2E2" stroke="#EF4444"/>
+  <text x="630" y="522" text-anchor="middle" font-size="9" font-weight="600" fill="#991B1B">🚨 alerts</text>
+
+  <!-- MCP Layer -->
+  <text x="450" y="560" text-anchor="middle" font-size="10" fill="#6B7280">MCP: Exa • Firebase • Gemini • Slack • Email • Calendar</text>
+
+  <!-- Bot Actions -->
+  <rect x="170" y="610" width="560" height="70" rx="12" fill="#F0FDF4" stroke="#22C55E" stroke-width="2"/>
+  <text x="450" y="635" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">⚡ Autonomous Actions</text>
+  <text x="280" y="660" text-anchor="middle" font-size="10" fill="#166534">✅ Run daily scans</text>
+  <text x="450" y="660" text-anchor="middle" font-size="10" fill="#166534">✅ Send alerts if threshold met</text>
+  <text x="620" y="660" text-anchor="middle" font-size="10" fill="#166534">✅ Generate weekly reports</text>
+
+  <!-- Human Override -->
+  <rect x="170" y="695" width="560" height="55" rx="12" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="450" y="720" text-anchor="middle" font-size="12" font-weight="600" fill="#92400E">👤 Human-in-the-Loop Checkpoints</text>
+  <text x="450" y="740" text-anchor="middle" font-size="10" fill="#92400E">Review before publish • Approve high-stakes actions • Override decisions</text>
+
+  <!-- Outputs -->
+  <path d="M250 770 L250 810" stroke="#22C55E" stroke-width="2" marker-end="url(#arrow-green6)"/>
+  <path d="M450 770 L450 810" stroke="#22C55E" stroke-width="2" marker-end="url(#arrow-green6)"/>
+  <path d="M650 770 L650 810" stroke="#22C55E" stroke-width="2" marker-end="url(#arrow-green6)"/>
+
+  <rect x="150" y="820" width="200" height="45" rx="10" fill="#10B981"/>
+  <text x="250" y="848" text-anchor="middle" font-size="11" font-weight="600" fill="white">📊 Auto-Dashboard</text>
+
+  <rect x="350" y="820" width="200" height="45" rx="10" fill="#3B82F6"/>
+  <text x="450" y="848" text-anchor="middle" font-size="11" font-weight="600" fill="white">📧 Auto-Reports</text>
+
+  <rect x="550" y="820" width="200" height="45" rx="10" fill="#EF4444"/>
+  <text x="650" y="848" text-anchor="middle" font-size="11" font-weight="600" fill="white">🚨 Auto-Alerts</text>
+
+  <!-- Benefits Box -->
+  <rect x="760" y="330" width="130" height="160" rx="8" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1"/>
+  <text x="825" y="355" text-anchor="middle" font-size="11" font-weight="600" fill="#0369A1">Benefits</text>
+  <text x="825" y="380" text-anchor="middle" font-size="9" fill="#0C4A6E">✅ 24/7 operation</text>
+  <text x="825" y="400" text-anchor="middle" font-size="9" fill="#0C4A6E">✅ No manual trigger</text>
+  <text x="825" y="420" text-anchor="middle" font-size="9" fill="#0C4A6E">✅ Multi-channel</text>
+  <text x="825" y="440" text-anchor="middle" font-size="9" fill="#0C4A6E">✅ Self-healing</text>
+  <text x="825" y="460" text-anchor="middle" font-size="9" fill="#0C4A6E">✅ Scalable</text>
+  <text x="825" y="480" text-anchor="middle" font-size="9" fill="#0C4A6E">✅ Human override</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrow6" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrow-cyan" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#0EA5E9"/>
+    </marker>
+    <marker id="arrow-green6" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#22C55E"/>
+    </marker>
+  </defs>
+</svg>
