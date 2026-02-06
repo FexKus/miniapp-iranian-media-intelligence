@@ -49,8 +49,8 @@ export default async function handler(req: Request): Promise<Response> {
       includeDomains: gatedDomains,
       numResults: Math.max(1, Math.min(50, numResults ?? 50)),
       contents: { text: true },
-      startPublishedDate,
-      endPublishedDate,
+      startCrawlDate: startPublishedDate,
+      endCrawlDate: endPublishedDate,
     };
 
     let data: any;

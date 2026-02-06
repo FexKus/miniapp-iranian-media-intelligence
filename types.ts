@@ -76,7 +76,7 @@ export interface Report {
   searchDiagnostics?: {
     query: string;
     domainsSearched: number;
-    dateRange: { startPublishedDate: string | null; endPublishedDate: string | null };
+    dateRange: { startCrawlDate: string | null; endCrawlDate: string | null };
     rawExaCount: number;
     afterDomainFilter: number;
     afterValidation: number;

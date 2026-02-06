@@ -10,20 +10,20 @@ describe("isPersian", () => {
 
 describe("computeDateRange", () => {
   it("uses custom range when provided", () => {
-    const { startPublishedDate, endPublishedDate } = computeDateRange(
+    const { startCrawlDate, endCrawlDate } = computeDateRange(
       "custom",
       "2025-01-01",
       "2025-01-07"
     );
-    expect(startPublishedDate).toContain("2025-01-01");
-    expect(endPublishedDate).toContain("2025-01-07");
+    expect(startCrawlDate).toContain("2025-01-01");
+    expect(endCrawlDate).toContain("2025-01-07");
   });
 
   it("defaults to a recent start date for last24h", () => {
     const before = Date.now();
-    const { startPublishedDate } = computeDateRange("last24h");
-    expect(startPublishedDate).toBeTruthy();
-    const start = new Date(startPublishedDate as string).getTime();
+    const { startCrawlDate } = computeDateRange("last24h");
+    expect(startCrawlDate).toBeTruthy();
+    const start = new Date(startCrawlDate as string).getTime();
     expect(start).toBeLessThan(before);
     expect(start).toBeGreaterThan(before - 1000 * 60 * 60 * 48);
   });

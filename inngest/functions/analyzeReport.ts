@@ -104,27 +104,27 @@ async function translateTopic(topic: string): Promise<{ query: string; warnings?
 }
 
 export function computeDateRange(timeRange?: string, customStartDate?: string, customEndDate?: string) {
-  let startPublishedDate: string | undefined;
-  let endPublishedDate: string | undefined;
+  let startCrawlDate: string | undefined;
+  let endCrawlDate: string | undefined;
 
   if (timeRange === "custom" && customStartDate && customEndDate) {
-    startPublishedDate = new Date(customStartDate).toISOString();
-    endPublishedDate = new Date(customEndDate).toISOString();
+    startCrawlDate = new Date(customStartDate).toISOString();
+    endCrawlDate = new Date(customEndDate).toISOString();
   } else if (timeRange === "last24h") {
     const oneDayAgo = new Date();
     oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-    startPublishedDate = oneDayAgo.toISOString();
+    startCrawlDate = oneDayAgo.toISOString();
   } else if (timeRange === "last30d") {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    startPublishedDate = thirtyDaysAgo.toISOString();
+    startCrawlDate = thirtyDaysAgo.toISOString();
   } else {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    startPublishedDate = sevenDaysAgo.toISOString();
+    startCrawlDate = sevenDaysAgo.toISOString();
   }
 
-  return { startPublishedDate, endPublishedDate };
+  return { startCrawlDate, endCrawlDate };
 }
 
 function coerceArticleResult(article: Partial<ArticleResult>): ArticleResult {
@@ -158,7 +158,7 @@ async function searchArticles(query: string, includeDomains: string[], timeRange
       diagnostics: {
         query,
         domainsSearched: 0,
-        dateRange: { startPublishedDate: null, endPublishedDate: null },
+        dateRange: { startCrawlDate: null, endCrawlDate: null },
         rawExaCount: 0,
         afterDomainFilter: 0,
         afterValidation: 0,
@@ -169,15 +169,15 @@ async function searchArticles(query: string, includeDomains: string[], timeRange
     };
   }
 
-  const { startPublishedDate, endPublishedDate } = computeDateRange(timeRange, customStartDate, customEndDate);
+  const { startCrawlDate, endCrawlDate } = computeDateRange(timeRange, customStartDate, customEndDate);
   const body = {
     query,
     type: "keyword",
     includeDomains: gatedDomains,
     numResults: EXA_FETCH_LIMIT,
     contents: { text: true },
-    startPublishedDate,
-    endPublishedDate,
+    startCrawlDate,
+    endCrawlDate,
   };
 
   const data = await withRetry<any>(() =>
@@ -241,8 +241,8 @@ async function searchArticles(query: string, includeDomains: string[], timeRange
         includeDomains: gatedDomains,
         numResults: NEURAL_NUM_RESULTS,
         contents: { text: true },
-        startPublishedDate,
-        endPublishedDate,
+        startCrawlDate,
+        endCrawlDate,
       };
 
       const neuralData = await withRetry<any>(() =>
@@ -311,7 +311,7 @@ async function searchArticles(query: string, includeDomains: string[], timeRange
     diagnostics: {
       query,
       domainsSearched: gatedDomains.length,
-      dateRange: { startPublishedDate, endPublishedDate: endPublishedDate || null },
+      dateRange: { startCrawlDate, endCrawlDate: endCrawlDate || null },
       rawExaCount: rawResults.length,
       afterDomainFilter: gated.length,
       afterValidation: validated.length,
