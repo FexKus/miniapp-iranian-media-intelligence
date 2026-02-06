@@ -1,5 +1,5 @@
 import { ArticleResult } from "../types.js";
-import { isValidHostname, normalizeHostname, readJson, requireEnv, safeHostnameFromUrl, validateArticle, withRetry } from "./_shared.js";
+import { diversifyByDomain, isValidHostname, normalizeHostname, readJson, requireEnv, safeHostnameFromUrl, validateArticle, withRetry } from "./_shared.js";
 
 export const config = {
   runtime: "edge",
@@ -45,8 +45,9 @@ export default async function handler(req: Request): Promise<Response> {
 
     const body = {
       query,
+      type: "keyword",
       includeDomains: gatedDomains,
-      numResults: Math.max(1, Math.min(50, numResults ?? 20)),
+      numResults: Math.max(1, Math.min(50, numResults ?? 50)),
       contents: { text: true },
       startPublishedDate,
       endPublishedDate,
@@ -112,7 +113,9 @@ export default async function handler(req: Request): Promise<Response> {
       return true;
     });
 
-    return Response.json({ results: deduped, warning });
+    const diverse = diversifyByDomain(deduped, 20);
+
+    return Response.json({ results: diverse, warning });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
     return Response.json({ error: msg }, { status: 500 });

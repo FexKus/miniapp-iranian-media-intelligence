@@ -7,6 +7,7 @@ import {
   validateArticle,
   extractCandidateEntitiesFromSummary,
   buildConsistencyWarnings,
+  diversifyByDomain,
   withRetry,
   withRetryAsync,
 } from './_shared';
@@ -338,5 +339,46 @@ describe('withRetryAsync', () => {
     expect(result).toBe('ok');
     expect(op).toHaveBeenCalledTimes(3);
     vi.useRealTimers();
+  });
+});
+
+describe('diversifyByDomain', () => {
+  const article = (domain: string, id: number) => ({ domain, id });
+
+  it('round-robins across domains before repeating any', () => {
+    const articles = [
+      article('a.com', 1), article('a.com', 2), article('a.com', 3),
+      article('b.com', 4), article('b.com', 5),
+      article('c.com', 6),
+    ];
+    const result = diversifyByDomain(articles, 4);
+    // First round: a.com(1), b.com(4), c.com(6). Second round: a.com(2)
+    expect(result.map((r) => r.id)).toEqual([1, 4, 6, 2]);
+  });
+
+  it('caps output at max', () => {
+    const articles = [
+      article('a.com', 1), article('a.com', 2),
+      article('b.com', 3), article('b.com', 4),
+    ];
+    const result = diversifyByDomain(articles, 2);
+    expect(result).toHaveLength(2);
+    expect(result.map((r) => r.id)).toEqual([1, 3]);
+  });
+
+  it('returns empty array for empty input', () => {
+    expect(diversifyByDomain([], 10)).toEqual([]);
+  });
+
+  it('handles single domain', () => {
+    const articles = [article('a.com', 1), article('a.com', 2), article('a.com', 3)];
+    const result = diversifyByDomain(articles, 5);
+    expect(result.map((r) => r.id)).toEqual([1, 2, 3]);
+  });
+
+  it('returns all articles when max exceeds total', () => {
+    const articles = [article('a.com', 1), article('b.com', 2)];
+    const result = diversifyByDomain(articles, 100);
+    expect(result).toHaveLength(2);
   });
 });

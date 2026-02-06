@@ -134,8 +134,8 @@ describe('Search API - Domain Flow Integration', () => {
     it('returns warning when domain limit exceeded', async () => {
       mockExaResponse([]);
 
-      // Create 30 unique domains (exceeds 25 limit)
-      const manyDomains = Array.from({ length: 30 }, (_, i) => `domain${i}.com`);
+      // Create 55 unique domains (exceeds 50 limit)
+      const manyDomains = Array.from({ length: 55 }, (_, i) => `domain${i}.com`);
 
       const req = createRequest({
         query: 'test query',
@@ -147,12 +147,12 @@ describe('Search API - Domain Flow Integration', () => {
       const data = await response.json();
 
       expect(data.warning).toContain('Domain limit reached');
-      expect(data.warning).toContain('25');
-      expect(data.warning).toContain('30');
+      expect(data.warning).toContain('50');
+      expect(data.warning).toContain('55');
 
-      // Verify only 25 domains were sent to Exa
+      // Verify only 50 domains were sent to Exa
       const callBody = JSON.parse(mockFetch.mock.calls[0][1].body);
-      expect(callBody.includeDomains).toHaveLength(25);
+      expect(callBody.includeDomains).toHaveLength(50);
     });
   });
 

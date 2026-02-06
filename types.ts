@@ -73,6 +73,17 @@ export interface Report {
   articles: ArticleResult[];
   error?: string;
   searchWarning?: string; // Warning from search (e.g., invalid domains)
+  searchDiagnostics?: {
+    query: string;
+    domainsSearched: number;
+    dateRange: { startPublishedDate: string | null; endPublishedDate: string | null };
+    rawExaCount: number;
+    afterDomainFilter: number;
+    afterValidation: number;
+    afterDedup: number;
+    finalCount?: number;
+    searchMode?: string;
+  };
   // New fields for P0.3, P1.4, P1.5, P1.6
   coverage?: CoverageMetadata; // Coverage metadata (P0.3)
   queryWarnings?: string[]; // Translation/query warnings (P1.6)

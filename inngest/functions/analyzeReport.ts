@@ -3,6 +3,7 @@ import { inngest } from "../client.js";
 import { getAdminDb } from "../../lib/firebaseAdmin.js";
 import {
   buildConsistencyWarnings,
+  diversifyByDomain,
   isValidHostname,
   normalizeHostname,
   requireEnv,
@@ -15,6 +16,7 @@ import {
 import { ArticleResult, CoverageMetadata, EvaluatorResult } from "../../types.js";
 
 const MAX_DOMAINS = 50;
+const EXA_FETCH_LIMIT = 50;
 const MAX_ARTICLES = 20;
 const EVALUATOR_MAX_ARTICLES = 15;
 const EVALUATOR_TIMEOUT_MS = 30000;
@@ -150,14 +152,29 @@ async function searchArticles(query: string, includeDomains: string[], timeRange
     warning = `Domain limit reached: only the first ${MAX_DOMAINS} of ${uniqueDomains.length} sources will be searched.`;
   }
   if (gatedDomains.length === 0) {
-    return { results: [] as ArticleResult[], warning: "No valid domains provided. Check your media source list." };
+    return {
+      results: [] as ArticleResult[],
+      warning: "No valid domains provided. Check your media source list.",
+      diagnostics: {
+        query,
+        domainsSearched: 0,
+        dateRange: { startPublishedDate: null, endPublishedDate: null },
+        rawExaCount: 0,
+        afterDomainFilter: 0,
+        afterValidation: 0,
+        afterDedup: 0,
+        finalCount: 0,
+        searchMode: "keyword",
+      },
+    };
   }
 
   const { startPublishedDate, endPublishedDate } = computeDateRange(timeRange, customStartDate, customEndDate);
   const body = {
     query,
+    type: "keyword",
     includeDomains: gatedDomains,
-    numResults: MAX_ARTICLES,
+    numResults: EXA_FETCH_LIMIT,
     contents: { text: true },
     startPublishedDate,
     endPublishedDate,
@@ -203,14 +220,106 @@ async function searchArticles(query: string, includeDomains: string[], timeRange
     .filter((a): a is ArticleResult => a !== null);
 
   const seen = new Set<string>();
-  const deduped = validated.filter((r) => {
+  let deduped = validated.filter((r) => {
     const key = r.url?.trim();
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
   });
 
-  return { results: deduped, warning };
+  // Hybrid search: neural fallback when keyword results are thin
+  let searchMode: "keyword" | "hybrid" = "keyword";
+  const NEURAL_THRESHOLD = 6;
+  const NEURAL_NUM_RESULTS = 15;
+
+  if (deduped.length < NEURAL_THRESHOLD) {
+    console.log(`[Search] Keyword returned ${deduped.length} results (< ${NEURAL_THRESHOLD}). Running neural fallback...`);
+    try {
+      const neuralBody = {
+        query,
+        type: "neural",
+        includeDomains: gatedDomains,
+        numResults: NEURAL_NUM_RESULTS,
+        contents: { text: true },
+        startPublishedDate,
+        endPublishedDate,
+      };
+
+      const neuralData = await withRetry<any>(() =>
+        fetch("https://api.exa.ai/search", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": apiKey,
+          },
+          body: JSON.stringify(neuralBody),
+        })
+      );
+
+      const neuralRaw: any[] = Array.isArray(neuralData?.results) ? neuralData.results : [];
+      console.log(`[Search] Neural fallback returned ${neuralRaw.length} raw results`);
+
+      const neuralMapped: ArticleResult[] = neuralRaw.map((r) => ({
+        title: r.title || "Untitled",
+        url: r.url,
+        publishedDate: r.publishedDate,
+        author: r.author,
+        text: (r.text || "").trim()
+          ? r.text
+          : "[No article text returned by Exa for this result. Open the source link to read it.]",
+        domain: r.url ? normalizeHostname(new URL(r.url).hostname) : "unknown",
+      }));
+
+      const neuralGated = neuralMapped.filter((r) => {
+        const host = safeHostnameFromUrl(r.url);
+        if (!host) return false;
+        return selectedDomains.has(host);
+      });
+
+      const neuralValidated: ArticleResult[] = neuralGated
+        .map((article) => {
+          const validation = validateArticle(article);
+          if (!validation.valid) return null;
+          return { ...article, evidenceQuality: validation.evidenceQuality } as ArticleResult;
+        })
+        .filter((a): a is ArticleResult => a !== null);
+
+      // Merge neural results, dedup against existing URLs
+      const neuralNew = neuralValidated.filter((r) => {
+        const key = r.url?.trim();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      if (neuralNew.length > 0) {
+        deduped = [...deduped, ...neuralNew];
+        searchMode = "hybrid";
+        console.log(`[Search] Neural added ${neuralNew.length} new results. Total: ${deduped.length}`);
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Unknown error";
+      console.log(`[Search] Neural fallback failed: ${msg}. Continuing with keyword results.`);
+    }
+  }
+
+  const diverse = diversifyByDomain(deduped, MAX_ARTICLES);
+
+  return {
+    results: diverse,
+    warning,
+    diagnostics: {
+      query,
+      domainsSearched: gatedDomains.length,
+      dateRange: { startPublishedDate, endPublishedDate: endPublishedDate || null },
+      rawExaCount: rawResults.length,
+      afterDomainFilter: gated.length,
+      afterValidation: validated.length,
+      afterDedup: deduped.length,
+      finalCount: diverse.length,
+      searchMode,
+    },
+  };
 }
 
 async function analyzeArticles(
@@ -396,6 +505,11 @@ export const analyzeReport = inngest.createFunction(
           stage: "Searching sources...",
           updatedAt: new Date(),
         });
+        // Persist translation to watchlist item only when clean (no warnings)
+        if (report.watchlistItemId && (!queryWarnings || queryWarnings.length === 0)) {
+          const watchlistRef = db.collection("users").doc(userId).collection("watchlist").doc(report.watchlistItemId);
+          await watchlistRef.update({ persianQuery }).catch(() => {});
+        }
       } else {
         await reportRef.update({
           stage: "Searching sources...",
@@ -403,7 +517,7 @@ export const analyzeReport = inngest.createFunction(
         });
       }
 
-      const { results: rawArticles, warning: searchWarning } = await step.run("search", () =>
+      const { results: rawArticles, warning: searchWarning, diagnostics: searchDiagnostics } = await step.run("search", () =>
         searchArticles(
           persianQuery || report.topic,
           report.domains || [],
@@ -421,11 +535,22 @@ export const analyzeReport = inngest.createFunction(
           : report.timeRange === "last30d" ? "30 days"
           : report.timeRange === "custom" ? "the selected date range"
           : "7 days";
+
+        const diag = searchDiagnostics;
+        const diagLines = diag ? [
+          `\n**Search details:**`,
+          `- Query: ${diag.query}`,
+          `- Sources searched: ${diag.domainsSearched} domains`,
+          `- Exa returned: ${diag.rawExaCount} raw results`,
+          `- After filtering: ${diag.afterValidation} valid articles`,
+        ].join('\n') : '';
+
         await reportRef.update({
           articleLinks: [],
           coverage,
           searchWarning: searchWarning || null,
-          summary: `## No Coverage Found\n\nNo articles were found for **${report.topic}** in the last ${timeLabel} across the selected media sources.\n\n**Suggestions:**\n- Expand the monitoring period (e.g., try 7 or 30 days)\n- Enable additional media sources in the Sources tab\n- Check that the topic translates well to Persian search terms`,
+          searchDiagnostics: searchDiagnostics || null,
+          summary: `## No Coverage Found\n\nNo articles were found for **${report.topic}** in the last ${timeLabel} across the selected media sources.\n${diagLines}\n\n**Suggestions:**\n- Expand the monitoring period (e.g., try 7 or 30 days)\n- Enable additional media sources in the Sources tab\n- Check that the topic translates well to Persian search terms`,
           status: "completed",
           stage: "Complete",
           updatedAt: new Date(),
@@ -444,6 +569,7 @@ export const analyzeReport = inngest.createFunction(
         })),
         coverage,
         searchWarning: searchWarning || null,
+        searchDiagnostics: searchDiagnostics || null,
         stage: "Analyzing intelligence...",
         updatedAt: new Date(),
       });

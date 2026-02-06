@@ -72,6 +72,8 @@ function asReport(id: string, data: any): Report {
         }))
       : [],
     error: data.error || undefined,
+    searchWarning: data.searchWarning || undefined,
+    searchDiagnostics: data.searchDiagnostics || undefined,
     coverage: data.coverage || undefined,
     queryWarnings: data.queryWarnings || undefined,
     verifierWarnings: data.verifierWarnings || undefined,

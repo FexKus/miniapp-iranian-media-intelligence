@@ -126,8 +126,8 @@ export function validateArticle(article: {
 
   const textLength = article.text?.trim().length ?? 0;
 
-  // Junk detection
-  if (article.text && JUNK_PATTERNS.some(p => p.test(article.text!))) {
+  // Junk detection — only for short texts (likely scrape failures, not real articles)
+  if (article.text && textLength < 500 && JUNK_PATTERNS.some(p => p.test(article.text!))) {
     return { valid: false, evidenceQuality: 'truncated', reason: 'Junk content detected' };
   }
 
@@ -210,6 +210,42 @@ export function buildConsistencyWarnings(
   }
 
   return warnings.slice(0, MAX_ENTITIES);
+}
+
+// ============================================================
+// Domain Diversity (round-robin to prevent single-source dominance)
+// ============================================================
+
+export function diversifyByDomain<T extends { domain: string }>(
+  articles: T[],
+  max: number
+): T[] {
+  const byDomain = new Map<string, T[]>();
+  for (const a of articles) {
+    const list = byDomain.get(a.domain) || [];
+    list.push(a);
+    byDomain.set(a.domain, list);
+  }
+
+  const result: T[] = [];
+  const domains = [...byDomain.keys()];
+  let round = 0;
+
+  while (result.length < max) {
+    let added = false;
+    for (const domain of domains) {
+      const list = byDomain.get(domain)!;
+      if (round < list.length) {
+        result.push(list[round]);
+        added = true;
+        if (result.length >= max) break;
+      }
+    }
+    if (!added) break;
+    round++;
+  }
+
+  return result;
 }
 
 // ============================================================
