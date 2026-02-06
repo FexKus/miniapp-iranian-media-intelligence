@@ -18,7 +18,7 @@ import ReactMarkdown from 'react-markdown';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent, CardHeader } from './ui/card';
-import { cn } from '../lib/utils';
+import { cn, linkifyUrls } from '../lib/utils';
 
 interface DashboardProps {
   watchlist: WatchlistItem[];
@@ -378,7 +378,7 @@ const Dashboard = ({
                 {report.summary ? (
                   <div className="prose prose-sm max-w-none">
                     <ReactMarkdown components={MarkdownComponents}>
-                      {report.summary}
+                      {linkifyUrls(report.summary)}
                     </ReactMarkdown>
                   </div>
                 ) : (

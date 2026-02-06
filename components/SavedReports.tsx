@@ -6,6 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collap
 import { Report } from '../types';
 import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
+import { linkifyUrls } from '../lib/utils';
 
 interface SavedReportsProps {
   reports: Report[];
@@ -99,7 +100,7 @@ const SavedReports = ({ reports, onToggleReportSaved, onDeleteReport }: SavedRep
                   <CollapsibleContent>
                     <CardContent className="pt-0">
                       <div className="prose prose-sm dark:prose-invert max-w-none">
-                        <ReactMarkdown>{report.summary || ''}</ReactMarkdown>
+                        <ReactMarkdown>{linkifyUrls(report.summary || '')}</ReactMarkdown>
                       </div>
                     </CardContent>
                   </CollapsibleContent>

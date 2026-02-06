@@ -415,6 +415,24 @@ export const analyzeReport = inngest.createFunction(
       const articles = rawArticles.map(coerceArticleResult);
 
       const coverage = computeCoverageMetadata(articles, report.domainLeanings || {});
+
+      if (articles.length === 0) {
+        const timeLabel = report.timeRange === "last24h" ? "24 hours"
+          : report.timeRange === "last30d" ? "30 days"
+          : report.timeRange === "custom" ? "the selected date range"
+          : "7 days";
+        await reportRef.update({
+          articleLinks: [],
+          coverage,
+          searchWarning: searchWarning || null,
+          summary: `## No Coverage Found\n\nNo articles were found for **${report.topic}** in the last ${timeLabel} across the selected media sources.\n\n**Suggestions:**\n- Expand the monitoring period (e.g., try 7 or 30 days)\n- Enable additional media sources in the Sources tab\n- Check that the topic translates well to Persian search terms`,
+          status: "completed",
+          stage: "Complete",
+          updatedAt: new Date(),
+        });
+        return { ok: true };
+      }
+
       await reportRef.update({
         articleLinks: articles.map((a) => ({
           title: a.title,
